@@ -10,7 +10,7 @@ from .models import Pizza, Topping, Sub, Pasta, Salad, Dinner
 
 # Create your views here.
 # pylint: disable=no-member
-@login_required(login_url='/login')
+# @login_required(login_url='/login')
 def index(request):
     context = {
         "regular_pizzas": get_menu(Pizza.objects.filter(crust='Regular').all()),
