@@ -9,7 +9,9 @@ from .models import Pizza, Topping, Sub, Pasta, Salad, Dinner
 
 
 # Create your views here.
+
 # pylint: disable=no-member
+
 # @login_required(login_url='/login')
 def index(request):
     context = {
@@ -24,7 +26,7 @@ def index(request):
     }
     return render(request, 'orders/index.html', context)
 
-def register_view(request):
+def register(request):
     if request.method == 'GET':
         return render(request, 'orders/register.html', {"message": None})
 
@@ -71,6 +73,19 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return render(request, 'orders/login.html', {"message": "Logged out."})
+
+def add_item(request):
+    if request.method == 'POST':
+        pass
+    
+    return render(request, 'orders/index.html')
+
+def delete_item(request):
+    if request.method == 'POST':
+        pass
+    
+    return render(request, 'orders/index.html')
+
 
 def get_menu(products):
     """List each item with different sizes in a row - name, small, large"""
