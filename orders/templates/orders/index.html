@@ -1,0 +1,114 @@
+{% extends 'orders/base.html' %}
+
+{% block body %}
+
+{% if user %}
+<div>Hello, {{ user }}</div>
+<a href="{% url 'logout' %}">Logout</a>
+{% endif %}
+
+<h1>Regular Pizzas</h1>
+<table>
+    <tr>
+        <th></th>
+        <th>Small</th>
+        <th>Large</th>
+    </tr>
+    {% for regular_pizza in regular_pizzas %}
+    <tr>
+        <td>{{ regular_pizza.name }}</td>
+        <td>{{ regular_pizza.price_small }}</td>
+        <td>{{ regular_pizza.price_large }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h1>Sicilian Pizzas</h1>
+<table>
+    <tr>
+        <th></th>
+        <th>Small</th>
+        <th>Large</th>
+    </tr>
+    {% for sicilian_pizza in sicilian_pizzas %}
+    <tr>
+        <td>{{ sicilian_pizza.name }}</td>
+        <td>{{ sicilian_pizza.price_small }}</td>
+        <td>{{ sicilian_pizza.price_large }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h1>Toppings</h1>
+<table>
+    <tr>
+        <th></th>
+    </tr>
+    {% for topping in toppings %}
+    <tr>
+        <td>{{ topping.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h1>Subs</h1>
+<table>
+    <tr>
+        <th></th>
+        <th>Small</th>
+        <th>Large</th>
+    </tr>
+    {% for sub in subs %}
+    <tr>
+        <td>{{ sub.name }}</td>
+        <td>{{ sub.price_small }}</td>
+        <td>{{ sub.price_large }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h1>Pasta</h1>
+<table>
+    <tr>
+        <th></th>
+        <th></th>
+    </tr>
+    {% for pasta in pastas %}
+    <tr>
+        <td>{{ pasta.name }}</td>
+        <td>{{ pasta.price }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h1>Salads</h1>
+<table>
+    <tr>
+        <th></th>
+        <th></th>
+    </tr>
+    {% for salad in salads %}
+    <tr>
+        <td>{{ salad.name }}</td>
+        <td>{{ salad.price }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h1>Dinner Platters</h1>
+<table>
+    <tr>
+        <th></th>
+        <th>Small</th>
+        <th>Large</th>
+    </tr>
+    {% for dinner in dinners %}
+    <tr>
+        <td>{{ dinner.name }}</td>
+        <td>{{ dinner.price_small }}</td>
+        <td>{{ dinner.price_large }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
