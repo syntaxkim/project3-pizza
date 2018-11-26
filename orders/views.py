@@ -12,7 +12,6 @@ from .models import Pizza, Topping, Sub, Pasta, Salad, Dinner
 
 # pylint: disable=no-member
 
-# @login_required(login_url='/login')
 def index(request):
     context = {
         "regular_pizzas": get_menu(Pizza.objects.filter(crust='Regular').all()),
@@ -74,17 +73,13 @@ def logout_view(request):
     logout(request)
     return render(request, 'orders/login.html', {"message": "Logged out."})
 
-def add_item(request):
-    if request.method == 'POST':
-        pass
-    
-    return render(request, 'orders/index.html')
+@login_required(login_url='/login')
+def add_item(request, item_id):
+    return render(request, 'orders/login.html', {"message": item_id})
 
-def delete_item(request):
-    if request.method == 'POST':
-        pass
-    
-    return render(request, 'orders/index.html')
+@login_required(login_url='/login')
+def delete_item(request, item_id):
+    return render(request, 'orders/login.html', {"message": item_id})
 
 
 def get_menu(products):

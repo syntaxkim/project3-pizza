@@ -17,8 +17,8 @@
     {% for regular_pizza in regular_pizzas %}
     <tr>
         <td>{{ regular_pizza.name }}</td>
-        <td>{{ regular_pizza.price_small }}</td>
-        <td>{{ regular_pizza.price_large }}</td>
+        <td>{{ regular_pizza.price_small }} <a href="{% url 'add_item' regular_pizza.id_small %}">Add to Cart</a></td>
+        <td>{{ regular_pizza.price_large }} <a href="{% url 'add_item' regular_pizza.id_large %}">Add to Cart</a></td>
     </tr>
     {% endfor %}
 </table>
@@ -33,8 +33,8 @@
     {% for sicilian_pizza in sicilian_pizzas %}
     <tr>
         <td>{{ sicilian_pizza.name }}</td>
-        <td>{{ sicilian_pizza.price_small }}</td>
-        <td>{{ sicilian_pizza.price_large }}</td>
+        <td>{{ sicilian_pizza.price_small }} <a href="{% url 'add_item' sicilian_pizza.id_small %}">Add to Cart</a></td>
+        <td>{{ sicilian_pizza.price_large }} <a href="{% url 'add_item' sicilian_pizza.id_large %}">Add to Cart</a></td>
     </tr>
     {% endfor %}
 </table>
