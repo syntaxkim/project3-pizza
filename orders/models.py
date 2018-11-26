@@ -37,7 +37,7 @@ class Item(models.Model):
     """Overall Item-Price table"""
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(max_length=64)
-    price = models.IntegerField(blank=True) # Blankable for Toppings
+    price = models.IntegerField(blank=True, default=0) # Blankable for Toppings
 
     def __str__(self):
         return f"{self.category}: {self.name} _ {self.price}"
@@ -59,7 +59,7 @@ class Pizza(Item):
     )
     size = models.CharField(max_length=8, choices=SIZE_CHOICES)
     max_toppings = models.IntegerField(default=0)
-    toppings = models.ManyToManyField('Topping', related_name='toppings')
+    toppings = models.ManyToManyField('Topping', blank=True, related_name='toppings')
 
     def __str__(self):
         return f"{self.crust} Pizza with {self.name} ({self.size}) _ {self.price}"
