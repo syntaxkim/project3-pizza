@@ -5,26 +5,71 @@
 {% load static %}
 <script src="{% static 'orders/item.js' %}"></script>
 
-<h1>{{ item }}</h1>
+<h1>{{ item.name }}</h1>
+
+<form action="{% url 'add_item' item.id %}" method="POST">
 
 {% if item.category.name == 'Pizza' %}
-<h1>Toppings: </h1>
-<table>
-    <tr>
-        <th></th>
-    </tr>
-    {% for topping in toppings %}
-    <tr>
-        <td>{{ topping.name }}</td>
-    </tr>
-    {% endfor %}
-</table>
+    <h1>Size: {{ item.pizza.size }}</h1>
+    {% if item.pizza.max_toppings == 1 %}
+        <h1>Toppings: </h1>
+        {% for i in 'i' %}
+            <select>
+            {% for topping in toppings %}
+                <option>{{ topping.name }}</option>
+            {% endfor %}
+            </select>
+        {% endfor %}
+    {% endif %}
+    {% if item.pizza.max_toppings == 2 %}
+        <h1>Toppings: </h1>
+        {% for i in 'ii' %}
+            <select>
+            {% for topping in toppings %}
+                <option>{{ topping.name }}</option>
+            {% endfor %}
+            </select>
+        {% endfor %}
+    {% endif %}
+    {% if item.pizza.max_toppings == 3 %}
+        <h1>Toppings: </h1>
+        {% for i in 'iii' %}
+            <select>
+            {% for topping in toppings %}
+                <option>{{ topping.name }}</option>
+            {% endfor %}
+            </select>
+        {% endfor %}
+    {% endif %}
 {% endif %}
 
 {% if item.category.name == 'Sub' %}
-<h1>Extra Cheese: (check box)</h1>
+    <h1>Size: {{ item.sub.size }}</h1>
+    <h1>Extra Cheese: </h1>
+    <input type="checkbox">
+{% endif %}
+
+{% if item.category.name == 'Dinner Platters' %}
+    <h1>Size: {{ item.dinner.size }}</h1>
 {% endif %}
 
 <h1>Quantity: </h1>
+<select id="quantity">
+    <option value=1>1</option>
+    <option value=2>2</option>
+    <option value=3>3</option>
+    <option value=4>4</option>
+    <option value=5>5</option>
+    <option value=6>6</option>
+    <option value=7>7</option>
+    <option value=8>8</option>
+    <option value=9>9</option>
+    <option value=10>10</option>
+</select>
+
+<h1>Price: <div id="price">{{ item.price }}</div></h1>
+<div id="price2"></div>
+
+</form>
 
 {% endblock %}

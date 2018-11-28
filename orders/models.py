@@ -15,14 +15,14 @@ class Category(models.Model):
     SUB = 'Sub'
     PASTA = 'Pasta'
     SALAD = 'Salad'
-    DINNER = 'Dinner Platters'
+    DINNER = 'Dinner Platter'
     CATEGORY_CHOICES = (
         (PIZZA, 'Pizza'),
         (TOPPING, 'Topping'),
         (SUB, 'Sub menu'),
         (PASTA, 'Pasta'),
         (SALAD, 'Salad'),
-        (DINNER, 'Dinner Platters')
+        (DINNER, 'Dinner Platter')
     )
     # In order to make custom categories, delete choices attribute.
     name = models.CharField(max_length=16, choices=CATEGORY_CHOICES)
