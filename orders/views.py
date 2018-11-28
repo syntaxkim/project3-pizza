@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Pizza, Topping, Sub, Pasta, Salad, Dinner
+from .models import Pizza, Topping, Sub, Pasta, Salad, Dinner, Item
 
 
 # Create your views here.
@@ -72,6 +72,13 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return render(request, 'orders/login.html', {"message": "Logged out."})
+
+def item(request, item_id):
+    context = {
+        "item": Item.objects.get(pk=item_id),
+        "toppings": Topping.objects.all()
+    }
+    return render(request, 'orders/item.html', context)
 
 @login_required(login_url='/login')
 def add_item(request, item_id):

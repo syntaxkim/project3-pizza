@@ -1,0 +1,30 @@
+{% extends 'base_orders.html' %}
+
+{% block body %}
+
+{% load static %}
+<script src="{% static 'orders/item.js' %}"></script>
+
+<h1>{{ item }}</h1>
+
+{% if item.category.name == 'Pizza' %}
+<h1>Toppings: </h1>
+<table>
+    <tr>
+        <th></th>
+    </tr>
+    {% for topping in toppings %}
+    <tr>
+        <td>{{ topping.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+{% if item.category.name == 'Sub' %}
+<h1>Extra Cheese: (check box)</h1>
+{% endif %}
+
+<h1>Quantity: </h1>
+
+{% endblock %}
