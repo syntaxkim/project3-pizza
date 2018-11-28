@@ -18,6 +18,10 @@
         {% elif cart_item.extra %}
             <li>+ Extra Cheese</li>
         {% endif %}
+        <form action="{% url 'delete_item' cart_item.id %}" method="POST">
+        {% csrf_token %}
+            <input type="submit" value="Delete">
+        </form>
     {% endfor %}
 </p>
 {% else %}

@@ -146,7 +146,16 @@ def add_item(request, item_id):
 
 @login_required(login_url='/login')
 def delete_item(request, item_id):
-    return render(request, 'orders/login.html', {"message": item_id})
+    if request.method == 'GET':
+        return HttpResponseNotFound()
+
+    try:
+        cart_item = CartItem.objects.get(pk=item_id)
+        cart_item.delete()
+    except CartItem.DoesNotExist:
+        return HttpResponseNotFound()
+
+    return HttpResponseRedirect(reverse('cart'))
 
 
 def get_menu(products):
