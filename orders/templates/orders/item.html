@@ -52,8 +52,10 @@
 
     {% if item.category.name == 'Sub' %}
         <h1>Size: {{ item.sub.size }}</h1>
-        <h1>{{ extra_cheese.name }} (+<span id="extra_cheese_price">{{ extra_cheese.price }}</span>)</h1>
-        <input name="extra_cheese" id="extra_cheese" type="checkbox">
+        {% for extra in extras %}
+        <h1>{{ extra.name }} (+<span id="extra_price">{{ extra.price }}</span>)</h1>
+        <input name="extra" value="{{ extra.id }}" id="extra" type="checkbox">
+        {% endfor %}
     {% endif %}
 
     {% if item.category.name == 'Dinner Platter' %}

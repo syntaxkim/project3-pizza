@@ -125,7 +125,8 @@ class CartItem(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     toppings =models.ManyToManyField(Topping, blank=True, related_name='toppings') # For pizza
-    extra_cheese = models.BooleanField(default=False) # For sub
+    extra = models.BooleanField(default=False) # For sub
+    price = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.user} {self.item} {self.quantity}"

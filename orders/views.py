@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Pizza, Topping, Sub, Extra, Pasta, Salad, Dinner, Item
+from .models import Item, Pizza, Topping, Sub, Extra, Pasta, Salad, Dinner, CartItem
 
 
 # Create your views here.
@@ -52,7 +52,7 @@ def register(request):
     except:
         return render(request, 'orders/register.html', {"message": "Unexpected Error."})
 
-    return render(request, 'orders/login.html', {"message": "Please login with your new account."})
+    return HttpResponseRedirect(reverse('login_view'))
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -78,9 +78,19 @@ def item(request, item_id):
     context = {
         "item": Item.objects.get(pk=item_id),
         "toppings": Topping.objects.all(),
-        "extra_cheese": Extra.objects.get(name='Extra Cheese')
+        "extras": Extra.objects.all()
     }
     return render(request, 'orders/item.html', context)
+
+@login_required(login_url='/login')
+def cart_list(request):
+    cart_list = CartItem.objects.filter(user=request.user).all()
+    context = {
+        "cart_list": cart_list
+    }
+
+    return render(request, 'orders/cart.html', context)
+
 
 @login_required(login_url='/login')
 def add_item(request, item_id):
@@ -94,41 +104,45 @@ def add_item(request, item_id):
     except Item.DoesNotExist:
         return HttpResponseNotFound()
 
-    if request.POST['quantity']:
-        quantity = int(request.POST['quantity'])
-        price = quantity * item.price
+    quantity = int(request.POST['quantity'])
+    price = quantity * item.price
+
+    try:
+        cart_item = CartItem.objects.create(user=request.user, item=item, quantity=quantity)
+    except:
+        return HttpResponseNotFound()
 
     if item.category.name == 'Pizza':
         try:
             topping1 = Topping.objects.get(pk=request.POST['topping1'])
-            print(topping1)
+            cart_item.toppings.add(topping1)
         except:
             pass
 
         try:
             topping2 = Topping.objects.get(pk=request.POST['topping2'])
-            print(topping2)
+            cart_item.toppings.add(topping2)
         except:
             pass
 
         try:
             topping3 = Topping.objects.get(pk=request.POST['topping3'])
-            print(topping3)
+            cart_item.toppings.add(topping3)
         except:
             pass
 
     if item.category.name == 'Sub':
         try:
-            request.POST['extra_cheese']
-            price = price + 500
+            extra = Extra.objects.get(pk=request.POST['extra'])
+            price = price + (quantity * extra.price)
+            cart_item.extra = True
         except:
             pass
-    
-    print(item.name)
-    print(quantity)
-    print(price)
 
-    return render(request, 'orders/index.html', {"message": item_id})
+    cart_item.price = price
+    cart_item.save()
+
+    return HttpResponseRedirect(reverse('cart'))
 
 @login_required(login_url='/login')
 def delete_item(request, item_id):

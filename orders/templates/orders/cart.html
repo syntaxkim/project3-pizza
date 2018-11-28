@@ -1,0 +1,24 @@
+{% extends 'base_orders.html' %}
+
+{% block body %}
+
+{% if cart_list %}
+<p>
+    {% for cart_item in cart_list %}
+        <h1>{{ cart_item.item.name }}</h1>
+        {% if cart_item.item.category.name == 'Pizza' %}
+            <li>Crust: {{ cart_item.item.pizza.crust }} </li>
+            <li>Topping{{ cart_item.toppings.all|pluralize }}: 
+            {% for topping in cart_item.toppings.all %}
+                {{ topping.name }}
+            {% endfor %}
+        {% elif cart_item.extra %}
+            <li>+ Extra Cheese</li>
+        {% endif %}
+    {% endfor %}
+</p>
+{% else %}
+    <div>No items in the cart.</div>
+{% endif %}
+
+{% endblock %}
