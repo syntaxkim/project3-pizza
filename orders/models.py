@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -59,7 +61,6 @@ class Pizza(Item):
     )
     size = models.CharField(max_length=8, choices=SIZE_CHOICES)
     max_toppings = models.IntegerField(default=0)
-    toppings = models.ManyToManyField('Topping', blank=True, related_name='toppings')
 
     def __str__(self):
         return f"{self.crust} Pizza with {self.name} ({self.size}) _ {self.price}"
@@ -110,3 +111,13 @@ class Dinner(Item):
 
     def __str__(self):
         return f"{self.name} ({self.size}) _ {self.price}"
+
+class CartItem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cart')
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+    toppings =models.ManyToManyField(Topping, blank=True, related_name='toppings') # For pizza
+    extra_cheese = models.BooleanField(default=False) # For sub
+
+    def __str__(self):
+        return f"{self.user} {self.item} {self.quantity}"
