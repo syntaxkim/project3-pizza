@@ -41,6 +41,13 @@ class Item(models.Model):
     """Overall Item-Price table"""
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(max_length=64)
+    S = 'Small'
+    L = 'Large'
+    SIZE_CHOICES = (
+        (S, 'Small'),
+        (L, 'Large')
+    )
+    size = models.CharField(max_length=8, choices=SIZE_CHOICES, blank=True)
     price = models.IntegerField(blank=True, default=0) # Blankable for Toppings
 
     def __str__(self):
@@ -55,13 +62,6 @@ class Pizza(Item):
         (SICILIAN, 'Sicilian')
     )
     crust = models.CharField(max_length=8, choices=CRUST_CHOICES)
-    S = 'Small'
-    L = 'Large'
-    SIZE_CHOICES = (
-        (S, 'Small'),
-        (L, 'Large')
-    )
-    size = models.CharField(max_length=8, choices=SIZE_CHOICES)
     max_toppings = models.IntegerField(default=0)
 
     def __str__(self):
@@ -74,13 +74,6 @@ class Topping(Item):
 
 class Sub(Item):
     """Define sub-menus."""
-    S = 'Small'
-    L = 'Large'
-    SIZE_CHOICES = (
-        (S, 'Small'),
-        (L, 'Large')
-    )
-    size = models.CharField(max_length=8, choices=SIZE_CHOICES)
 
     def __str__(self):
         return f"{self.name} ({self.size}) _ {self.price}"
@@ -105,13 +98,6 @@ class Salad(Item):
 
 class Dinner(Item):
     """Define dinner platters."""
-    S = 'Small'
-    L = 'Large'
-    SIZE_CHOICES = (
-        (S, 'Small'),
-        (L, 'Large')
-    )
-    size = models.CharField(max_length=8, choices=SIZE_CHOICES)
 
     class Meta:
         verbose_name = "Dinner Platter"

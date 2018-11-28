@@ -5,13 +5,16 @@
 {% if cart_list %}
 <p>
     {% for cart_item in cart_list %}
-        <h1>{{ cart_item.item.name }}</h1>
+        <h1>{{ cart_item.item.category }} - {{ cart_item.item.name }} {% if cart_item.item.size %}({{ cart_item.item.size }}){% endif %}</h1>
         {% if cart_item.item.category.name == 'Pizza' %}
             <li>Crust: {{ cart_item.item.pizza.crust }} </li>
-            <li>Topping{{ cart_item.toppings.all|pluralize }}: 
-            {% for topping in cart_item.toppings.all %}
-                {{ topping.name }}
-            {% endfor %}
+            {% if cart_item.toppings.all|length >= 1 %}
+                <li>Topping{{ cart_item.toppings.all|pluralize }}: 
+                {% for topping in cart_item.toppings.all %}
+                    <li>{{ topping.name }}</li>
+                {% endfor %}
+                </li>
+            {% endif %}
         {% elif cart_item.extra %}
             <li>+ Extra Cheese</li>
         {% endif %}
