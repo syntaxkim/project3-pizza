@@ -52,7 +52,7 @@
 
     {% if item.category.name == 'Sub' %}
         <h1>Size: {{ item.sub.size }}</h1>
-        <h1>Extra Cheese (+<span id="extra_cheese_price">{{ extra_cheese_price }}</span>)</h1>
+        <h1>{{ extra_cheese.name }} (+<span id="extra_cheese_price">{{ extra_cheese.price }}</span>)</h1>
         <input name="extra_cheese" id="extra_cheese" type="checkbox">
     {% endif %}
 

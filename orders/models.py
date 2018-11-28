@@ -13,6 +13,7 @@ class Category(models.Model):
     PIZZA = 'Pizza'
     TOPPING = 'Topping'
     SUB = 'Sub'
+    EXTRA = 'Extra'
     PASTA = 'Pasta'
     SALAD = 'Salad'
     DINNER = 'Dinner Platter'
@@ -20,6 +21,7 @@ class Category(models.Model):
         (PIZZA, 'Pizza'),
         (TOPPING, 'Topping'),
         (SUB, 'Sub menu'),
+        (EXTRA, 'Extra'),
         (PASTA, 'Pasta'),
         (SALAD, 'Salad'),
         (DINNER, 'Dinner Platter')
@@ -82,6 +84,12 @@ class Sub(Item):
 
     def __str__(self):
         return f"{self.name} ({self.size}) _ {self.price}"
+
+class Extra(Item):
+    """Define extra-options."""
+
+    def __str__(self):
+        return f"{self.name}"
 
 class Pasta(Item):
     """Define pastas."""

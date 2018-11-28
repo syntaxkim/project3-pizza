@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Pizza, Topping, Sub, Pasta, Salad, Dinner, Item
+from .models import Pizza, Topping, Sub, Extra, Pasta, Salad, Dinner, Item
 
 
 # Create your views here.
@@ -16,10 +16,11 @@ def index(request):
     context = {
         "regular_pizzas": get_menu(Pizza.objects.filter(crust='Regular').all()),
         "sicilian_pizzas": get_menu(Pizza.objects.filter(crust='Sicilian').all()),
-        "toppings": get_menu(Topping.objects.all()),
+        "toppings": Topping.objects.all(),
         "subs": get_menu(Sub.objects.all()),
-        "pastas": get_menu(Pasta.objects.all()),
-        "salads": get_menu(Salad.objects.all()),
+        "extras": Extra.objects.all(),
+        "pastas": Pasta.objects.all(),
+        "salads": Salad.objects.all(),
         "dinners": get_menu(Dinner.objects.all()),
         "user": request.user
     }
@@ -77,7 +78,7 @@ def item(request, item_id):
     context = {
         "item": Item.objects.get(pk=item_id),
         "toppings": Topping.objects.all(),
-        "extra_cheese_price": 500
+        "extra_cheese": Extra.objects.get(name='Extra Cheese')
     }
     return render(request, 'orders/item.html', context)
 
