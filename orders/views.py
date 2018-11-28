@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -76,13 +76,58 @@ def logout_view(request):
 def item(request, item_id):
     context = {
         "item": Item.objects.get(pk=item_id),
-        "toppings": Topping.objects.all()
+        "toppings": Topping.objects.all(),
+        "extra_cheese_price": 500
     }
     return render(request, 'orders/item.html', context)
 
 @login_required(login_url='/login')
 def add_item(request, item_id):
-    return render(request, 'orders/login.html', {"message": item_id})
+    if request.method == 'GET':
+        return HttpResponseNotFound()
+
+    try:
+        item = Item.objects.get(pk=item_id)
+    except KeyError:
+        return HttpResponseNotFound()
+    except Item.DoesNotExist:
+        return HttpResponseNotFound()
+
+    if request.POST['quantity']:
+        quantity = int(request.POST['quantity'])
+        price = quantity * item.price
+
+    if item.category.name == 'Pizza':
+        try:
+            topping1 = Topping.objects.get(pk=request.POST['topping1'])
+            print(topping1)
+        except:
+            pass
+
+        try:
+            topping2 = Topping.objects.get(pk=request.POST['topping2'])
+            print(topping2)
+        except:
+            pass
+
+        try:
+            topping3 = Topping.objects.get(pk=request.POST['topping3'])
+            print(topping3)
+        except:
+            pass
+
+    if item.category.name == 'Sub':
+        try:
+            request.POST['extra_cheese']
+            price = price + 500
+        except:
+            pass
+    
+    print(item.name)
+    print(quantity)
+    print(price)
+
+    return render(request, 'orders/index.html', {"message": item_id})
 
 @login_required(login_url='/login')
 def delete_item(request, item_id):
