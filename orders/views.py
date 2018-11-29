@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Item, Pizza, Topping, Sub, Extra, Pasta, Salad, Dinner, CartItem, OrderItem
+from .models import Item, Pizza, Topping, Sub, Extra, Pasta, Salad, Dinner, CartItem, OrderItem, Order
 
 
 # Create your views here.
@@ -185,7 +185,7 @@ def order_confirm(request):
         "subtotal": subtotal,
         "contact": request.POST['contact'],
         "billing_address": request.POST['billing_address'],
-        "shiping_address": request.POST['shiping_address'],
+        "shipping_address": request.POST['shipping_address'],
         "message": request.POST['message']
     }
 
@@ -207,11 +207,20 @@ def place_order(request):
 
     contact = request.POST['contact']
     billing_address = request.POST['billing_address']
-    shiping_address = request.POST['shiping_address']
+    shipping_address = request.POST['shipping_address']
     message = request.POST['message']
-    
-    # Move data from CartItem to OrderItem
+
     try:
+        # Create order(a set of order list) object
+        order = Order.objects.create(
+            user=request.user,
+            subtotal=subtotal,
+            contact=contact,
+            billing_address=billing_address,
+            shipping_address=shipping_address,
+            message=message,
+        )
+        # Copy data from CartItem to OrderItem
         for cart_item in cart_items:
             order_item = OrderItem.objects.create(
                 user=cart_item.user,
@@ -222,11 +231,10 @@ def place_order(request):
             )
             for topping in cart_item.toppings.all():
                 order_item.toppings.add(topping)
+            order.items.add(order_item)
+        cart_items.delete() # If everything completed, delete all cart items.
     except:
         return render(request, 'orders/orderResult.html', {"success": False})
-
-    # If everything completed, delete all cart items.
-    cart_items.delete()
 
     return render(request, 'orders/orderResult.html', {"success": True})
 
