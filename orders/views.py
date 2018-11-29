@@ -149,14 +149,6 @@ def order_first(request):
     if request.method == 'GET':
         return HttpResponseNotFound()
 
-    return HttpResponseRedirect(reverse('cart'))
-    
-
-@login_required(login_url='/login')
-def place_order(request):
-    if request.method == 'GET':
-        return HttpResponseNotFound()
-
     cart_items = CartItem.objects.filter(user=request.user)
     # Some sanity checks
     if int(request.POST['user_id']) is not request.user.id:
@@ -164,9 +156,60 @@ def place_order(request):
     elif int(request.POST['count_cart_items']) is not len(list(cart_items)):
         return HttpResponseNotFound()
 
-    print(int(request.POST['user_id']))
-    print(int(request.POST['count_cart_items']))
+    subtotal = 0
+    for cart_item in cart_items:
+        subtotal += cart_item.price
 
+    context = {
+        "cart_items": cart_items,
+        "subtotal": subtotal
+    }
+
+    return render(request, 'orders/orderStepFirst.html', context)
+
+@login_required(login_url='/login')
+def order_confirm(request):
+    if request.method == 'GET':
+        return HttpResponseNotFound()
+
+    # Some sanity checks
+    if int(request.POST['user_id']) is not request.user.id:
+        return HttpResponseNotFound()
+
+    cart_items = CartItem.objects.filter(user=request.user)
+    subtotal = 0
+    for cart_item in cart_items:
+        subtotal += cart_item.price
+
+    context = {
+        "subtotal": subtotal,
+        "contact": request.POST['contact'],
+        "billing_address": request.POST['billing_address'],
+        "shiping_address": request.POST['shiping_address'],
+        "message": request.POST['message']
+    }
+
+    return render(request, 'orders/orderConfirm.html', context)
+
+@login_required(login_url='/login')
+def place_order(request):
+    if request.method == 'GET':
+        return HttpResponseNotFound()
+
+    # Some sanity checks
+    if int(request.POST['user_id']) is not request.user.id:
+        return HttpResponseNotFound()
+
+    cart_items = CartItem.objects.filter(user=request.user)
+    subtotal = 0
+    for cart_item in cart_items:
+        subtotal += cart_item.price
+
+    contact = request.POST['contact']
+    billing_address = request.POST['billing_address']
+    shiping_address = request.POST['shiping_address']
+    message = request.POST['message']
+    
     # Move data from CartItem to OrderItem
     try:
         for cart_item in cart_items:
@@ -179,11 +222,13 @@ def place_order(request):
             )
             for topping in cart_item.toppings.all():
                 order_item.toppings.add(topping)
-            cart_item.delete()
     except:
-        return HttpResponseNotFound()
+        return render(request, 'orders/orderResult.html', {"success": False})
 
-    return HttpResponseRedirect(reverse('cart'))
+    # If everything completed, delete all cart items.
+    cart_items.delete()
+
+    return render(request, 'orders/orderResult.html', {"success": True})
 
 @login_required(login_url='/login')
 def delete_item(request, item_id):

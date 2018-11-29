@@ -1,0 +1,22 @@
+{% extends 'base_orders.html' %}
+
+{% block body %}
+
+<h1>Confirm your order.</h1>
+<li>Subtotal: {{ subtotal }}</li>
+<li>Contact: {{ contact }}</li>
+<li>Billing Address: {{ billing_address }}</li>
+<li>Shiping Address: {{ shiping_address }}</li>
+<li>Message: {{ message }}</li>
+
+<form action="{% url 'place_order' %}", method="POST">
+{% csrf_token %}
+    <input hidden name="user_id" value="{{ request.user.id }}">
+    <input hidden name="contact" value="{{ contact }}">
+    <input hidden name="billing_address" value="{{ billing_address }} ">
+    <input hidden name="shiping_address" value="{{ shiping_address }}">
+    <input hidden name="message" value="{{ message }}">
+    <input type="submit" value="Place Order">
+</form>
+
+{% endblock %}

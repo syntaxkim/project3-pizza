@@ -2,11 +2,44 @@
 
 {% block body %}
 
-<form action="{% url 'place_order' %}", method="POST">
+<h1>Cart items list</h1>
+<table>
+    <tr>
+        <td>Item</td>
+        <td>Size</td>
+        <td>Quantity</td>
+        <td>Price</td>
+        <td>Option</td>
+    </tr>
+    {% for cart_item in cart_items %}
+    <tr>
+        <td>{{ cart_item.item.name }}</td>
+        <td>{{ cart_item.item.size }}</td>
+        <td>{{ cart_item.quantity }}</td>
+        <td>{{ cart_item.price }}</td>
+        <td>{% if cart_item.extra %}
+                +Exra Cheese
+            {% elif cart_item.toppings.all|length >= 1 %}
+                {% for topping in cart_item.toppings.all %}
+                    <li>{{ topping.name }}</li>
+                {% endfor %}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h1>Subtotal: </h1>
+{{ subtotal }}
+
+<form action="{% url 'order_confirm' %}", method="POST">
 {% csrf_token %}
     <input hidden name="user_id" value="{{ request.user.id }}">
-    <input hidden name="count_cart_items" value="{{ cart_list|length }}">
-    <input type="submit" value="Place Order">
+    <input name="contact" placeholder="Phone number">
+    <input name="billing_address" placeholder="Billing Address">
+    <input name="shiping_address" placeholder="Shiping Address">
+    <input name="message" placeholder="Message (max_length = 50)">
+    <input type="submit" value="Confirm Order">
 </form>
 
 {% endblock %}
