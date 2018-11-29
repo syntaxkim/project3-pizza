@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, HttpResponseForbidden
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -255,10 +255,13 @@ def order_list(request):
 
 @login_required(login_url='/login')
 def order_detail(request, order_id):
-    try:
-        order = Order.objects.get(pk=order_id, user=request.user)
-    except Order.DoesNotExist:
-        return HttpResponseNotFound()
+    if request.user.is_superuser:
+        order = Order.objects.get(pk=order_id)
+    else:
+        try:
+            order = Order.objects.get(pk=order_id, user=request.user)
+        except Order.DoesNotExist:
+            return HttpResponseNotFound()
 
     context = {
         "order": order
@@ -278,6 +281,48 @@ def delete_item(request, item_id):
 
     return HttpResponseRedirect(reverse('cart'))
 
+@login_required(login_url='/login')
+def manage_order(request):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden()
+    
+    # Update order status.
+    if request.method == 'POST':
+        try:
+            order_id = request.POST['order_id']
+            status = request.POST['status']
+            order = Order.objects.get(pk=order_id)
+            order.status = status
+            order.save()
+        except:
+            return HttpResponseNotFound()
+
+    context = {
+        "orders": Order.objects.all().order_by('-order_time')
+    }
+
+    return render(request, 'orders/manageOrder.html', context)
+
+@login_required(login_url='/login')
+def manage_order_detail(request, order_id):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden()
+
+    # Update order status.
+    if request.method == 'POST':
+        try:
+            order_id = request.POST['order_id']
+            status = request.POST['status']
+            order = Order.objects.get(pk=order_id)
+            order.status = status
+            order.save()
+        except:
+            return HttpResponseNotFound()
+
+    context = {
+        "order": Order.objects.get(pk=order_id)
+    }
+    return render(request, 'orders/manageOrderDetail.html', context)
 
 def get_menu(products):
     """List each item with different sizes in a row - name, small, large"""

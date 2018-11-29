@@ -1,0 +1,36 @@
+{% extends 'base_orders.html' %}
+
+{% block body %}
+
+<h1>Order List</h1>
+
+<br>
+<h1>Recently Ordered Items</h1>
+{% for order in orders %}
+    {% if not order.recieved %}
+        <li><a href="{% url 'manage_order_detail' order.id %}">{{ order.order_time }}</a></li>
+        <form action="{% url 'manage_order' %}", method="POST">
+        {% csrf_token %}
+            <input hidden name="order_id" value="{{ order.id }}">
+            <select name="status">
+                <option value="Ordered">Ordered</option>
+                <option value="On Shipping">On Shipping</option>
+                <option value="Delivered">Delivered</option>
+            </select>
+            <input type="submit" value="Update">
+        </form>
+    {% endif %}
+{% endfor %}
+
+<br>
+<h1>Completed Orders</h1>
+{% for order in orders %}
+    {% if order.recieved %}
+        <li><a href="{% url 'manage_order_detail' order.id %}">{{ order.order_time }}</a></li>
+    {% endif %}
+{% endfor %}
+
+<br>
+<a href="{% url 'index' %}">Go back to menu.</a>
+
+{% endblock %}

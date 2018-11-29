@@ -26,15 +26,17 @@ Items
 <li>Status: {{ order.status }}</li>
 <li>Recieved: {{ order.recieved }}</li>
 
-{% if not order.recieved %}
-    <form action="{% url 'order_list' %}", method="POST">
-    {% csrf_token %}
-        <button name="recieved" value="{{ order.id }}">Recieved</button>
-    </form>
-    {% else %}
-        Recieved
-{% endif %}
+<form action="{% url 'manage_order_detail' order.id %}", method="POST">
+{% csrf_token %}
+    <input hidden name="order_id" value="{{ order.id }}">
+    <select name="status" selected="{{ order.status }}">    
+        <option value="Ordered">Ordered</option>
+        <option value="On Shipping">On Shipping</option>
+        <option value="Delivered">Delivered</option>
+    </select>
+    <input type="submit" value="Update">
+</form>
 
-<a href="{% url 'order_list' %}">Go back to my page</a>
+<a href="{% url 'manage_order' %}">Go back to manage.</a>
 
 {% endblock %}

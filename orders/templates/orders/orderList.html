@@ -2,7 +2,7 @@
 
 {% block body %}
 
-<h1>{{ request.user.username}}</h1>
+<h1>Order List</h1>
 
 {% for order in orders %}
     <li><a href="{% url 'order_detail' order.id %}">{{ order.order_time }}</a></li>
