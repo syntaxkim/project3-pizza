@@ -235,6 +235,10 @@ def place_order(request):
     except:
         return render(request, 'orders/orderResult.html', {"success": False})
 
+    return HttpResponseRedirect(reverse('order_result'))
+
+@login_required(login_url='/login')
+def order_result(request):
     return render(request, 'orders/orderResult.html', {"success": True})
 
 @login_required(login_url='/login')
@@ -245,6 +249,7 @@ def order_list(request):
             order = Order.objects.get(pk=order_id, user=request.user)
             order.recieved = True
             order.save()
+            return HttpResponseRedirect(reverse('order_list'))
         except:
             return HttpResponseNotFound()
 
@@ -294,6 +299,7 @@ def manage_order(request):
             order = Order.objects.get(pk=order_id)
             order.status = status
             order.save()
+            return HttpResponseRedirect(reverse('manage_order'))
         except:
             return HttpResponseNotFound()
 
@@ -316,6 +322,7 @@ def manage_order_detail(request, order_id):
             order = Order.objects.get(pk=order_id)
             order.status = status
             order.save()
+            return HttpResponseRedirect(reverse('manage_order_detail'))
         except:
             return HttpResponseNotFound()
 
