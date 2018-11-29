@@ -107,12 +107,45 @@ class Dinner(Item):
         return f"{self.name} ({self.size}) _ {self.price}"
 
 class CartItem(models.Model):
+    """Cart items"""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cart')
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
-    toppings =models.ManyToManyField(Topping, blank=True, related_name='toppings') # For pizza
+    toppings =models.ManyToManyField(Topping, blank=True, related_name='carts') # For pizza
     extra = models.BooleanField(default=False) # For sub
     price = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.user} {self.item} {self.quantity}"
+
+class OrderItem(models.Model):
+    """Order placed items"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+    toppings =models.ManyToManyField(Topping, blank=True, related_name='orders') # For pizza
+    extra = models.BooleanField(default=False) # For sub
+    price = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.user} {self.item} {self.quantity}"
+
+class Order(models.Model):
+    """Order summary""" # A set of order placed items
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order')
+    items = models.ManyToManyField(OrderItem, related_name='order')
+    subtotal = models.IntegerField('Shipment Total', default=0)
+    order_time = models.DateTimeField('Order placed', default=timezone.now)
+    billing_address = models.CharField(max_length=100)
+    shipping_address = models.CharField(max_length=100)
+    message = models.CharField(max_length=50, blank=True)
+    ORDERED = 'Ordered'
+    SHIPPING = 'On Shipping'
+    DELIVERED = 'Delivered'
+    STATUS_CHOCIES = (
+        (ORDERED, 'Ordered'),
+        (SHIPPING, 'On Shipping'),
+        (DELIVERED, 'Delivered')
+    )
+    status = models.CharField(max_length=16, choices=STATUS_CHOCIES, default=ORDERED)
+    recieved = models.BooleanField(default=False)

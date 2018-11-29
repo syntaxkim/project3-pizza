@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Subtotal
     item_price = document.querySelector('#price').innerHTML;
 
     quantity = 1;
