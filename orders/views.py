@@ -239,6 +239,15 @@ def place_order(request):
 
 @login_required(login_url='/login')
 def order_list(request):
+    if request.method == 'POST':
+        try:
+            order_id = request.POST['recieved']
+            order = Order.objects.get(pk=order_id, user=request.user)
+            order.recieved = True
+            order.save()
+        except:
+            return HttpResponseNotFound()
+
     context = {
         "orders": Order.objects.filter(user=request.user)
     }

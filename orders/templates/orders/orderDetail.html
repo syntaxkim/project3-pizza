@@ -17,6 +17,16 @@ Items
 <li>Status: {{ order.status }}</li>
 <li>Recieved: {{ order.recieved }}</li>
 
+{% if not order.recieved %}
+    <form action="{% url 'order_list' %}", method="POST">
+    {% csrf_token %}
+        <button name="recieved" value="{{ order.id }}">Recieved</button>
+    </form>
+    {% else %}
+        Recieved
+{% endif %}
+
+
 <a href="{% url 'order_list' %}">Go back to my page</a>
 
 {% endblock %}
