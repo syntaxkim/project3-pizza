@@ -249,7 +249,7 @@ def order_list(request):
             return HttpResponseNotFound()
 
     context = {
-        "orders": Order.objects.filter(user=request.user)
+        "orders": Order.objects.filter(user=request.user).order_by('-order_time')
     }
     return render(request, 'orders/orderList.html', context)
 
