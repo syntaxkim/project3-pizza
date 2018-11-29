@@ -1,0 +1,12 @@
+{% extends 'base_orders.html' %}
+
+{% block body %}
+
+<form action="{% url 'place_order' %}", method="POST">
+{% csrf_token %}
+    <input hidden name="user_id" value="{{ request.user.id }}">
+    <input hidden name="count_cart_items" value="{{ cart_list|length }}">
+    <input type="submit" value="Place Order">
+</form>
+
+{% endblock %}

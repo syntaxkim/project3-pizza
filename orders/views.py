@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Item, Pizza, Topping, Sub, Extra, Pasta, Salad, Dinner, CartItem
+from .models import Item, Pizza, Topping, Sub, Extra, Pasta, Salad, Dinner, CartItem, OrderItem
 
 
 # Create your views here.
@@ -141,6 +141,47 @@ def add_item(request, item_id):
 
     cart_item.price = price
     cart_item.save()
+
+    return HttpResponseRedirect(reverse('cart'))
+
+@login_required(login_url='/login')
+def order_first(request):
+    if request.method == 'GET':
+        return HttpResponseNotFound()
+
+    return HttpResponseRedirect(reverse('cart'))
+    
+
+@login_required(login_url='/login')
+def place_order(request):
+    if request.method == 'GET':
+        return HttpResponseNotFound()
+
+    cart_items = CartItem.objects.filter(user=request.user)
+    # Some sanity checks
+    if int(request.POST['user_id']) is not request.user.id:
+        return HttpResponseNotFound()
+    elif int(request.POST['count_cart_items']) is not len(list(cart_items)):
+        return HttpResponseNotFound()
+
+    print(int(request.POST['user_id']))
+    print(int(request.POST['count_cart_items']))
+
+    # Move data from CartItem to OrderItem
+    try:
+        for cart_item in cart_items:
+            order_item = OrderItem.objects.create(
+                user=cart_item.user,
+                item=cart_item.item,
+                quantity=cart_item.quantity,
+                extra=cart_item.extra,
+                price=cart_item.price
+            )
+            for topping in cart_item.toppings.all():
+                order_item.toppings.add(topping)
+            cart_item.delete()
+    except:
+        return HttpResponseNotFound()
 
     return HttpResponseRedirect(reverse('cart'))
 

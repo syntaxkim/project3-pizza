@@ -28,6 +28,12 @@
         </form>
     {% endfor %}
 </p>
+<form action="{% url 'order_first' %}", method="POST">
+{% csrf_token %}
+    <input hidden name="user_id" value="{{ request.user.id }}">
+    <input hidden name="count_cart_items" value="{{ cart_list|length }}">
+    <input type="submit" value="Place Order">
+</form>
 {% else %}
     <div>No items in the cart.</div>
 {% endif %}

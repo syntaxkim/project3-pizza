@@ -111,7 +111,7 @@ class CartItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cart')
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
-    toppings =models.ManyToManyField(Topping, blank=True, related_name='carts') # For pizza
+    toppings = models.ManyToManyField(Topping, blank=True, related_name='carts') # For pizza
     extra = models.BooleanField(default=False) # For sub
     price = models.IntegerField(default=0)
 
@@ -123,7 +123,7 @@ class OrderItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
-    toppings =models.ManyToManyField(Topping, blank=True, related_name='orders') # For pizza
+    toppings = models.ManyToManyField(Topping, blank=True, related_name='orders') # For pizza
     extra = models.BooleanField(default=False) # For sub
     price = models.IntegerField(default=0)
 
@@ -136,6 +136,7 @@ class Order(models.Model):
     items = models.ManyToManyField(OrderItem, related_name='order')
     subtotal = models.IntegerField('Shipment Total', default=0)
     order_time = models.DateTimeField('Order placed', default=timezone.now)
+    contact = models.CharField(max_length=100)
     billing_address = models.CharField(max_length=100)
     shipping_address = models.CharField(max_length=100)
     message = models.CharField(max_length=50, blank=True)
