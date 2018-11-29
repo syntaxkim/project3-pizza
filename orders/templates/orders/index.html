@@ -2,10 +2,13 @@
 
 {% block body %}
 
-{% if user %}
+{% if request.user.is_authenticated %}
 <div>Hello, {{ user }}</div>
 <a href="{% url 'logout' %}">Logout</a>
 <a href="{% url 'cart' %}">Cart</a>
+<a href="{% url 'order_list' %}">Order</a>
+{% else %}
+<a href="{% url 'login' %}">Login</a>
 {% endif %}
 
 <h1>Regular Pizzas</h1>

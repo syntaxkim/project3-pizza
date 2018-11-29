@@ -150,3 +150,6 @@ class Order(models.Model):
     )
     status = models.CharField(max_length=16, choices=STATUS_CHOCIES, default=ORDERED)
     recieved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user} {self.contact} {self.order_time} {self.status} {self.recieved}"

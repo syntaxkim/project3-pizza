@@ -1,0 +1,22 @@
+{% extends 'base_orders.html' %}
+
+{% block body %}
+
+<h1>{{ request.user.username}}</h1>
+
+Items
+{% for order_item in order.items.all %}
+    <li>{{ order_item.item.name }}</li>
+{% endfor %}
+<br>
+<li>Subtotal: {{ order.subtotal }}</li>
+<li>Contact: {{ order.contact }}</li>
+<li>Billing Address: {{ order.billing_address }}</li>
+<li>Shipping Address: {{ order.shipping_address }}</li>
+<li>Message: {{ order.message }}</li>
+<li>Status: {{ order.status }}</li>
+<li>Recieved: {{ order.recieved }}</li>
+
+<a href="{% url 'order_list' %}">Go back to my page</a>
+
+{% endblock %}

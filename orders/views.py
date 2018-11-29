@@ -21,8 +21,7 @@ def index(request):
         "extras": Extra.objects.all(),
         "pastas": Pasta.objects.all(),
         "salads": Salad.objects.all(),
-        "dinners": get_menu(Dinner.objects.all()),
-        "user": request.user
+        "dinners": get_menu(Dinner.objects.all())
     }
     return render(request, 'orders/index.html', context)
 
@@ -237,6 +236,25 @@ def place_order(request):
         return render(request, 'orders/orderResult.html', {"success": False})
 
     return render(request, 'orders/orderResult.html', {"success": True})
+
+@login_required(login_url='/login')
+def order_list(request):
+    context = {
+        "orders": Order.objects.filter(user=request.user)
+    }
+    return render(request, 'orders/orderList.html', context)
+
+@login_required(login_url='/login')
+def order_detail(request, order_id):
+    try:
+        order = Order.objects.get(pk=order_id, user=request.user)
+    except Order.DoesNotExist:
+        return HttpResponseNotFound()
+
+    context = {
+        "order": order
+    }
+    return render(request, 'orders/orderDetail.html', context)
 
 @login_required(login_url='/login')
 def delete_item(request, item_id):
