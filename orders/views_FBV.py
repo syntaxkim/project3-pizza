@@ -1,12 +1,9 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, HttpResponseForbidden
 from django.shortcuts import render
 from django.urls import reverse
-from django.views.generic.base import TemplateView
-from django.views.generic import DetailView, ListView
 
 from .models import Item, Pizza, Topping, Sub, Extra, Pasta, Salad, Dinner, CartItem, OrderItem, Order
 
@@ -17,22 +14,18 @@ from datetime import datetime
 
 # pylint: disable=no-member
 
-class IndexView(TemplateView):
-    template_name = 'orders/index.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context = {
-            "regular_pizzas": get_menu(Pizza.objects.filter(crust='Regular').all()),
-            "sicilian_pizzas": get_menu(Pizza.objects.filter(crust='Sicilian').all()),
-            "toppings": Topping.objects.all(),
-            "subs": get_menu(Sub.objects.all()),
-            "extras": Extra.objects.all(),
-            "pastas": Pasta.objects.all(),
-            "salads": Salad.objects.all(),
-            "dinners": get_menu(Dinner.objects.all())
-        }
-        return context
+def index(request):
+    context = {
+        "regular_pizzas": get_menu(Pizza.objects.filter(crust='Regular').all()),
+        "sicilian_pizzas": get_menu(Pizza.objects.filter(crust='Sicilian').all()),
+        "toppings": Topping.objects.all(),
+        "subs": get_menu(Sub.objects.all()),
+        "extras": Extra.objects.all(),
+        "pastas": Pasta.objects.all(),
+        "salads": Salad.objects.all(),
+        "dinners": get_menu(Dinner.objects.all())
+    }
+    return render(request, 'orders/index.html', context)
 
 def register(request):
     if request.method == 'GET':
@@ -88,30 +81,31 @@ def logout_view(request):
     logout(request)
     return render(request, 'orders/login.html', {"message": "Logged out."})
 
-class ItemDetail(DetailView):
-    model = Item
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["toppings"] = Topping.objects.all()
-        context["extras"] = Extra.objects.all()
-        return context
-
-class CartItemList(ListView):
-    model = CartItem
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["cart_list"] = CartItem.objects.filter(user=self.request.user).all()
-        return context
+def item(request, item_id):
+    context = {
+        "item": Item.objects.get(pk=item_id),
+        "toppings": Topping.objects.all(),
+        "extras": Extra.objects.all()
+    }
+    return render(request, 'orders/item_detail.html', context)
 
 @login_required(login_url='/login')
-def add_item(request, pk):
+def cart_item_list(request):
+    cart_list = CartItem.objects.filter(user=request.user).all()
+    context = {
+        "cart_list": cart_list
+    }
+
+    return render(request, 'orders/cartitem_list.html', context)
+
+
+@login_required(login_url='/login')
+def add_item(request, item_id):
     if request.method == 'GET':
         return HttpResponseNotFound()
 
     try:
-        item = Item.objects.get(pk=pk)
+        item = Item.objects.get(pk=item_id)
     except KeyError:
         return HttpResponseNotFound()
     except Item.DoesNotExist:
@@ -271,12 +265,12 @@ def order_list(request):
     return render(request, 'orders/order_list.html', context)
 
 @login_required(login_url='/login')
-def order_detail(request, pk):
+def order_detail(request, order_id):
     if request.user.is_superuser:
-        order = Order.objects.get(pk=pk)
+        order = Order.objects.get(pk=order_id)
     else:
         try:
-            order = Order.objects.get(pk=pk, user=request.user)
+            order = Order.objects.get(pk=order_id, user=request.user)
         except Order.DoesNotExist:
             return HttpResponseNotFound()
 
@@ -286,12 +280,12 @@ def order_detail(request, pk):
     return render(request, 'orders/order_detail.html', context)
 
 @login_required(login_url='/login')
-def delete_item(request, pk):
+def delete_item(request, item_id):
     if request.method == 'GET':
         return HttpResponseNotFound()
 
     try:
-        cart_item = CartItem.objects.get(pk=pk)
+        cart_item = CartItem.objects.get(pk=item_id)
         cart_item.delete()
     except CartItem.DoesNotExist:
         return HttpResponseNotFound()
@@ -324,7 +318,7 @@ def manage_order(request):
     return render(request, 'orders/manageOrder.html', context)
 
 @login_required(login_url='/login')
-def manage_order_detail(request, pk):
+def manage_order_detail(request, order_id):
     if not request.user.is_superuser:
         return HttpResponseForbidden()
 
@@ -341,7 +335,7 @@ def manage_order_detail(request, pk):
             return HttpResponseNotFound()
 
     context = {
-        "order": Order.objects.get(pk=pk)
+        "order": Order.objects.get(pk=order_id)
     }
     return render(request, 'orders/manageOrderDetail.html', context)
 
