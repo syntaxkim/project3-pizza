@@ -7,6 +7,8 @@ from django.urls import reverse
 
 from .models import Item, Pizza, Topping, Sub, Extra, Pasta, Salad, Dinner, CartItem, OrderItem, Order
 
+from datetime import datetime
+
 
 # Create your views here.
 
@@ -109,43 +111,40 @@ def add_item(request, item_id):
     except Item.DoesNotExist:
         return HttpResponseNotFound()
 
+    # Get form values
+    topping1_id = request.POST.get('topping1', False)
+    topping2_id = request.POST.get('topping2', False)
+    topping3_id = request.POST.get('topping3', False)
+    extra_id = request.POST.get('extra', False)
     quantity = int(request.POST['quantity'])
+
     price = quantity * item.price
 
     try:
         cart_item = CartItem.objects.create(user=request.user, item=item, quantity=quantity)
-    except:
-        return HttpResponseNotFound()
 
-    if item.category.name == 'Pizza':
-        try:
-            topping1 = Topping.objects.get(pk=request.POST['topping1'])
+        # If the item has any toppings on it.
+        if topping1_id:
+            topping1 = Topping.objects.get(pk=topping1_id)
             cart_item.toppings.add(topping1)
-        except:
-            pass
-
-        try:
-            topping2 = Topping.objects.get(pk=request.POST['topping2'])
+        if topping2_id:
+            topping2 = Topping.objects.get(pk=topping2_id)
             cart_item.toppings.add(topping2)
-        except:
-            pass
-
-        try:
-            topping3 = Topping.objects.get(pk=request.POST['topping3'])
+        if topping3_id:
+            topping3 = Topping.objects.get(pk=topping3_id)
             cart_item.toppings.add(topping3)
-        except:
-            pass
 
-    if item.category.name == 'Sub':
-        try:
-            extra = Extra.objects.get(pk=request.POST['extra'])
-            price = price + (quantity * extra.price)
+        # If the item has extra,
+        if extra_id:
+            extra = Extra.objects.get(pk=extra_id)
             cart_item.extra = True
-        except:
-            pass
+            price = price + (quantity * extra.price)
 
-    cart_item.price = price
-    cart_item.save()
+        cart_item.price = price
+        cart_item.save()
+    except:
+        cart_item.delete()
+        return HttpResponseNotFound()
 
     return HttpResponseRedirect(reverse('cart'))
 
@@ -155,6 +154,7 @@ def order_first(request):
         return HttpResponseNotFound()
 
     cart_items = CartItem.objects.filter(user=request.user)
+    
     # Some sanity checks
     if int(request.POST['user_id']) is not request.user.id:
         return HttpResponseNotFound()
@@ -309,8 +309,10 @@ def manage_order(request):
         except:
             return HttpResponseNotFound()
 
+    today = datetime.today()
     context = {
-        "orders": Order.objects.all().order_by('-order_time')
+        "today": today,
+        "orders": Order.objects.filter(order_time__day=today.day).order_by('-order_time')
     }
 
     return render(request, 'orders/manageOrder.html', context)
