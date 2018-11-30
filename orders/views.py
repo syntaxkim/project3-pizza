@@ -34,24 +34,30 @@ def register(request):
     password = request.POST['password']
     confirmation = request.POST['confirmation']
 
+    # Check forms if valid
     if not username:
         return render(request, 'orders/register.html', {"message": "No username."})
+    elif len(username) < 4:
+        return render(request, 'orders/register.html', {"message": "Username should be longer than 4 characters."})
     elif not email:
         return render(request, 'orders/register.html', {"message": "No Email."})
+    # elif email is not valid:
+    #     pass
     elif not password or not confirmation:
         return render(request, 'orders/register.html', {"message": "Type your password."})
+    elif len(password) < 8 or len(confirmation) < 8:
+        return render(request, 'orders/register.html', {"message": "Password should be longer than 8 characters."})
     elif password != confirmation:
         return render(request, 'orders/register.html', {"message": "Passwords don't match."})
-
-    if User.objects.filter(email=email):
+    elif User.objects.filter(email=email):
         return render(request, 'orders/register.html', {"message": "Email is invalid or already taken."})
-    
-    try:
-        User.objects.create_user(username, email, password)
-    except:
-        return render(request, 'orders/register.html', {"message": "Unexpected Error."})
+    else:
+        try:
+            User.objects.create_user(username, email, password)
+        except:
+            return render(request, 'orders/register.html', {"message": "Registration failed."})
 
-    return HttpResponseRedirect(reverse('login_view'))
+    return HttpResponseRedirect(reverse('login'))
 
 def login_view(request):
     if request.user.is_authenticated:
