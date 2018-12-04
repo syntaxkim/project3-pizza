@@ -1,12 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, HttpResponseForbidden
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic.base import TemplateView
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, DeleteView
 
 from .models import Item, Pizza, Topping, Sub, Extra, Pasta, Salad, Dinner, CartItem, OrderItem, Order
 
@@ -34,6 +35,244 @@ class IndexView(TemplateView):
         }
         return context
 
+class ItemDetail(DetailView):
+    model = Item
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["toppings"] = Topping.objects.all()
+        context["extras"] = Extra.objects.all()
+        return context
+
+class CartItemList(ListView):
+    model = CartItem
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["cart_list"] = CartItem.objects.filter(user=self.request.user).all()
+        return context
+
+@login_required(login_url='/login')
+def add_item(request, pk):
+    if request.method == 'GET':
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    try:
+        item = Item.objects.get(pk=pk)
+    except KeyError:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+    except Item.DoesNotExist:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    # Get form values
+    topping1_id = request.POST.get('topping1', False)
+    topping2_id = request.POST.get('topping2', False)
+    topping3_id = request.POST.get('topping3', False)
+    extra_id = request.POST.get('extra', False)
+    quantity = int(request.POST['quantity'])
+
+    price = quantity * item.price
+
+    try:
+        cart_item = CartItem.objects.create(user=request.user, item=item, quantity=quantity)
+
+        # If the item has any toppings on it.
+        if topping1_id:
+            topping1 = Topping.objects.get(pk=topping1_id)
+            cart_item.toppings.add(topping1)
+        if topping2_id:
+            topping2 = Topping.objects.get(pk=topping2_id)
+            cart_item.toppings.add(topping2)
+        if topping3_id:
+            topping3 = Topping.objects.get(pk=topping3_id)
+            cart_item.toppings.add(topping3)
+
+        # If the item has extra,
+        if extra_id:
+            extra = Extra.objects.get(pk=extra_id)
+            cart_item.extra = True
+            price = price + (quantity * extra.price)
+
+        cart_item.price = price
+        cart_item.save()
+    except:
+        cart_item.delete()
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    return HttpResponseRedirect(reverse('cart'))
+
+@login_required(login_url='/login')
+def order_first(request):
+    if request.method == 'GET':
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    cart_items = CartItem.objects.filter(user=request.user)
+    
+    # Some sanity checks
+    if int(request.POST['user_id']) is not request.user.id:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+    elif int(request.POST['count_cart_items']) is not len(list(cart_items)):
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    subtotal = 0
+    for cart_item in cart_items:
+        subtotal += cart_item.price
+
+    context = {
+        "cart_items": cart_items,
+        "subtotal": subtotal
+    }
+
+    return render(request, 'orders/orderStepFirst.html', context)
+
+@login_required(login_url='/login')
+def order_confirm(request):
+    if request.method == 'GET':
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    # Some sanity checks
+    if int(request.POST['user_id']) is not request.user.id:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    cart_items = CartItem.objects.filter(user=request.user)
+    subtotal = 0
+    for cart_item in cart_items:
+        subtotal += cart_item.price
+
+    context = {
+        "subtotal": subtotal,
+        "contact": request.POST['contact'],
+        "billing_address": request.POST['billing_address'],
+        "shipping_address": request.POST['shipping_address'],
+        "message": request.POST['message']
+    }
+
+    return render(request, 'orders/orderConfirm.html', context)
+
+@login_required(login_url='/login')
+def place_order(request):
+    if request.method == 'GET':
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    # Some sanity checks
+    if int(request.POST['user_id']) is not request.user.id:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    cart_items = CartItem.objects.filter(user=request.user)
+    subtotal = 0
+    for cart_item in cart_items:
+        subtotal += cart_item.price
+
+    # Get form data
+    contact = request.POST['contact']
+    billing_address = request.POST['billing_address']
+    shipping_address = request.POST['shipping_address']
+    message = request.POST['message']
+
+    try:
+        # Create order(a set of order list) object
+        order = Order.objects.create(
+            user=request.user,
+            subtotal=subtotal,
+            contact=contact,
+            billing_address=billing_address,
+            shipping_address=shipping_address,
+            message=message,
+        )
+        # Copy data from CartItem to OrderItem
+        for cart_item in cart_items:
+            order_item = OrderItem.objects.create(
+                user=cart_item.user,
+                item=cart_item.item,
+                quantity=cart_item.quantity,
+                extra=cart_item.extra,
+                price=cart_item.price
+            )
+            for topping in cart_item.toppings.all():
+                order_item.toppings.add(topping)
+            order.items.add(order_item)
+        cart_items.delete() # If everything completed, delete all cart items.
+    except:
+        return render(request, 'orders/orderResult.html', {"success": False})
+
+    return HttpResponseRedirect(reverse('order_result'))
+
+@login_required(login_url='/login')
+def order_result(request):
+    return render(request, 'orders/orderResult.html', {"success": True})
+
+class OrderList(ListView):
+    model = Order
+
+    def post(self, request):
+        try:
+            # Update recieved status.
+            order_id = request.POST['recieved']
+            order = Order.objects.get(pk=order_id, user=request.user)
+            order.recieved = True
+            order.save()
+            return HttpResponseRedirect(reverse('order_list'))
+        except:
+            return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["orders"] = Order.objects.filter(user=self.request.user).order_by('-order_time')
+        return context
+
+class OrderDetail(DetailView):
+    model = Order
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["order"] = Order.objects.get(pk=self.kwargs['pk'], user=self.request.user)    
+        return context
+
+class DeleteItem(DeleteView):
+    model = CartItem
+    success_url = reverse_lazy('cart')
+
+class ManageOrder(PermissionRequiredMixin, ListView):
+    permission_required = 'orders.can_manage'
+    model = Order
+    template_name = 'orders/manageorder_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        today = datetime.today()
+        context["today"] = today
+        context["orders"] = Order.objects.filter(order_time__day=today.day).order_by('-order_time')
+        return context
+
+    def post(self, request, *args, **kwargs):
+        try:
+            # Update order status.
+            order_id = request.POST['order_id']
+            status = request.POST['status']
+            order = Order.objects.get(pk=order_id)
+            order.status = status
+            order.save()
+            return HttpResponseRedirect(reverse('manage_order'))
+        except:
+            return HttpResponseNotFound('<h1>Page not found</h1>')
+
+class ManageOrderDetail(PermissionRequiredMixin, DetailView):
+    permission_required = 'orders.can_manage'
+    model = Order
+    template_name = 'orders/manageorder_detail.html'
+
+    def post(self, request, *args, **kwargs):
+        try:
+            # Update order status.
+            order_id = request.POST['order_id']
+            status = request.POST['status']
+            order = Order.objects.get(pk=order_id)
+            order.status = status
+            order.save()
+            return HttpResponseRedirect(reverse('manage_order_detail'))
+        except:
+            return HttpResponseNotFound('<h1>Page not found</h1>')
+
 def register(request):
     if request.method == 'GET':
         return render(request, 'orders/register.html', {"message": None})
@@ -43,7 +282,7 @@ def register(request):
     password = request.POST['password']
     confirmation = request.POST['confirmation']
 
-    # Check forms if valid
+    # Check forms if valid.
     if not username:
         return render(request, 'orders/register.html', {"message": "No username."})
     elif len(username) < 4:
@@ -87,263 +326,6 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return render(request, 'orders/login.html', {"message": "Logged out."})
-
-class ItemDetail(DetailView):
-    model = Item
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["toppings"] = Topping.objects.all()
-        context["extras"] = Extra.objects.all()
-        return context
-
-class CartItemList(ListView):
-    model = CartItem
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["cart_list"] = CartItem.objects.filter(user=self.request.user).all()
-        return context
-
-@login_required(login_url='/login')
-def add_item(request, pk):
-    if request.method == 'GET':
-        return HttpResponseNotFound()
-
-    try:
-        item = Item.objects.get(pk=pk)
-    except KeyError:
-        return HttpResponseNotFound()
-    except Item.DoesNotExist:
-        return HttpResponseNotFound()
-
-    # Get form values
-    topping1_id = request.POST.get('topping1', False)
-    topping2_id = request.POST.get('topping2', False)
-    topping3_id = request.POST.get('topping3', False)
-    extra_id = request.POST.get('extra', False)
-    quantity = int(request.POST['quantity'])
-
-    price = quantity * item.price
-
-    try:
-        cart_item = CartItem.objects.create(user=request.user, item=item, quantity=quantity)
-
-        # If the item has any toppings on it.
-        if topping1_id:
-            topping1 = Topping.objects.get(pk=topping1_id)
-            cart_item.toppings.add(topping1)
-        if topping2_id:
-            topping2 = Topping.objects.get(pk=topping2_id)
-            cart_item.toppings.add(topping2)
-        if topping3_id:
-            topping3 = Topping.objects.get(pk=topping3_id)
-            cart_item.toppings.add(topping3)
-
-        # If the item has extra,
-        if extra_id:
-            extra = Extra.objects.get(pk=extra_id)
-            cart_item.extra = True
-            price = price + (quantity * extra.price)
-
-        cart_item.price = price
-        cart_item.save()
-    except:
-        cart_item.delete()
-        return HttpResponseNotFound()
-
-    return HttpResponseRedirect(reverse('cart'))
-
-@login_required(login_url='/login')
-def order_first(request):
-    if request.method == 'GET':
-        return HttpResponseNotFound()
-
-    cart_items = CartItem.objects.filter(user=request.user)
-    
-    # Some sanity checks
-    if int(request.POST['user_id']) is not request.user.id:
-        return HttpResponseNotFound()
-    elif int(request.POST['count_cart_items']) is not len(list(cart_items)):
-        return HttpResponseNotFound()
-
-    subtotal = 0
-    for cart_item in cart_items:
-        subtotal += cart_item.price
-
-    context = {
-        "cart_items": cart_items,
-        "subtotal": subtotal
-    }
-
-    return render(request, 'orders/orderStepFirst.html', context)
-
-@login_required(login_url='/login')
-def order_confirm(request):
-    if request.method == 'GET':
-        return HttpResponseNotFound()
-
-    # Some sanity checks
-    if int(request.POST['user_id']) is not request.user.id:
-        return HttpResponseNotFound()
-
-    cart_items = CartItem.objects.filter(user=request.user)
-    subtotal = 0
-    for cart_item in cart_items:
-        subtotal += cart_item.price
-
-    context = {
-        "subtotal": subtotal,
-        "contact": request.POST['contact'],
-        "billing_address": request.POST['billing_address'],
-        "shipping_address": request.POST['shipping_address'],
-        "message": request.POST['message']
-    }
-
-    return render(request, 'orders/orderConfirm.html', context)
-
-@login_required(login_url='/login')
-def place_order(request):
-    if request.method == 'GET':
-        return HttpResponseNotFound()
-
-    # Some sanity checks
-    if int(request.POST['user_id']) is not request.user.id:
-        return HttpResponseNotFound()
-
-    cart_items = CartItem.objects.filter(user=request.user)
-    subtotal = 0
-    for cart_item in cart_items:
-        subtotal += cart_item.price
-
-    contact = request.POST['contact']
-    billing_address = request.POST['billing_address']
-    shipping_address = request.POST['shipping_address']
-    message = request.POST['message']
-
-    try:
-        # Create order(a set of order list) object
-        order = Order.objects.create(
-            user=request.user,
-            subtotal=subtotal,
-            contact=contact,
-            billing_address=billing_address,
-            shipping_address=shipping_address,
-            message=message,
-        )
-        # Copy data from CartItem to OrderItem
-        for cart_item in cart_items:
-            order_item = OrderItem.objects.create(
-                user=cart_item.user,
-                item=cart_item.item,
-                quantity=cart_item.quantity,
-                extra=cart_item.extra,
-                price=cart_item.price
-            )
-            for topping in cart_item.toppings.all():
-                order_item.toppings.add(topping)
-            order.items.add(order_item)
-        cart_items.delete() # If everything completed, delete all cart items.
-    except:
-        return render(request, 'orders/orderResult.html', {"success": False})
-
-    return HttpResponseRedirect(reverse('order_result'))
-
-@login_required(login_url='/login')
-def order_result(request):
-    return render(request, 'orders/orderResult.html', {"success": True})
-
-@login_required(login_url='/login')
-def order_list(request):
-    if request.method == 'POST':
-        try:
-            order_id = request.POST['recieved']
-            order = Order.objects.get(pk=order_id, user=request.user)
-            order.recieved = True
-            order.save()
-            return HttpResponseRedirect(reverse('order_list'))
-        except:
-            return HttpResponseNotFound()
-
-    context = {
-        "orders": Order.objects.filter(user=request.user).order_by('-order_time')
-    }
-    return render(request, 'orders/order_list.html', context)
-
-@login_required(login_url='/login')
-def order_detail(request, pk):
-    if request.user.is_superuser:
-        order = Order.objects.get(pk=pk)
-    else:
-        try:
-            order = Order.objects.get(pk=pk, user=request.user)
-        except Order.DoesNotExist:
-            return HttpResponseNotFound()
-
-    context = {
-        "order": order
-    }
-    return render(request, 'orders/order_detail.html', context)
-
-@login_required(login_url='/login')
-def delete_item(request, pk):
-    if request.method == 'GET':
-        return HttpResponseNotFound()
-
-    try:
-        cart_item = CartItem.objects.get(pk=pk)
-        cart_item.delete()
-    except CartItem.DoesNotExist:
-        return HttpResponseNotFound()
-
-    return HttpResponseRedirect(reverse('cart'))
-
-@login_required(login_url='/login')
-def manage_order(request):
-    if not request.user.is_superuser:
-        return HttpResponseForbidden()
-    
-    # Update order status.
-    if request.method == 'POST':
-        try:
-            order_id = request.POST['order_id']
-            status = request.POST['status']
-            order = Order.objects.get(pk=order_id)
-            order.status = status
-            order.save()
-            return HttpResponseRedirect(reverse('manage_order'))
-        except:
-            return HttpResponseNotFound()
-
-    today = datetime.today()
-    context = {
-        "today": today,
-        "orders": Order.objects.filter(order_time__day=today.day).order_by('-order_time')
-    }
-
-    return render(request, 'orders/manageOrder.html', context)
-
-@login_required(login_url='/login')
-def manage_order_detail(request, pk):
-    if not request.user.is_superuser:
-        return HttpResponseForbidden()
-
-    # Update order status.
-    if request.method == 'POST':
-        try:
-            order_id = request.POST['order_id']
-            status = request.POST['status']
-            order = Order.objects.get(pk=order_id)
-            order.status = status
-            order.save()
-            return HttpResponseRedirect(reverse('manage_order_detail'))
-        except:
-            return HttpResponseNotFound()
-
-    context = {
-        "order": Order.objects.get(pk=pk)
-    }
-    return render(request, 'orders/manageOrderDetail.html', context)
 
 def get_menu(products):
     """List each item with different sizes in a row - name, small, large"""

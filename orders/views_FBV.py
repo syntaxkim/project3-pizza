@@ -315,7 +315,7 @@ def manage_order(request):
         "orders": Order.objects.filter(order_time__day=today.day).order_by('-order_time')
     }
 
-    return render(request, 'orders/manageOrder.html', context)
+    return render(request, 'orders/manageorder_list.html', context)
 
 @login_required(login_url='/login')
 def manage_order_detail(request, order_id):
@@ -337,7 +337,7 @@ def manage_order_detail(request, order_id):
     context = {
         "order": Order.objects.get(pk=order_id)
     }
-    return render(request, 'orders/manageOrderDetail.html', context)
+    return render(request, 'orders/manageorder_detail.html', context)
 
 def get_menu(products):
     """List each item with different sizes in a row - name, small, large"""
