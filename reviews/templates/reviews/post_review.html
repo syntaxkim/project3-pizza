@@ -1,6 +1,6 @@
-{% extends 'base_reviews.html' %}
+{% extends "base_reviews.html" %}
 
-{% block body %}
+{% block content %}
 
 <form action="{% url 'post_review' %}", method="POST">
 {% csrf_token %}

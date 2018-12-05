@@ -1,9 +1,14 @@
-{% extends 'base_reviews.html' %}
+{% extends "base_reviews.html" %}
 
-{% block body %}
+{% block content %}
 
 <h1>Review</h1>
 
-{{ review }}
+<p>{{ review.user}}</p>
+<p>{{ review.title }}</p>
+<p>{{ review.content }}</p>
+<p><img src="{{ review.image }}" alt="{{ review.image }}"></p>
+
+<a href="{% url 'review_list' %}">Go back to list</a>
 
 {% endblock %}

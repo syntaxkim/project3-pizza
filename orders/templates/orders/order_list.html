@@ -1,10 +1,14 @@
-{% extends 'base_orders.html' %}
+{% extends "base_orders.html" %}
 
-{% block body %}
+{% block content %}
 
 <h1>Order List</h1>
 
-{% for order in orders %}
+{% if not order_list %}
+    <p>No orders have been made.</p>
+{% endif %}
+
+{% for order in order_list %}
     <li><a href="{% url 'order_detail' order.id %}">{{ order.order_time }}</a></li>
     {% if not order.recieved %}
         <form action="{% url 'order_list' %}", method="POST">

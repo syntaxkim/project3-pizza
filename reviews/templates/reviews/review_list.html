@@ -1,11 +1,17 @@
-{% extends 'base_reviews.html' %}
+{% extends "base_reviews.html" %}
 
-{% block body %}
+{% block content %}
 
 <h1>REVIEWS</h1>
 
-{% for review in reviews %}
-<li>{{ review }}</li>
+{% if not review_list %}
+<p>No reviews yet</p>
+{% endif %}
+
+{% for review in review_list %}
+    <li><a href="{% url 'review_detail' review.id %}">{{ review }}</a></li>
 {% endfor %}
+
+<a href="{% url 'post_review' %}">Write</a>
 
 {% endblock %}

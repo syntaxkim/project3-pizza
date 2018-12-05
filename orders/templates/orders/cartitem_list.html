@@ -1,10 +1,10 @@
-{% extends 'base_orders.html' %}
+{% extends "base_orders.html" %}
 
-{% block body %}
+{% block content %}
 
-{% if cart_list %}
+{% if cartitem_list %}
 <p>
-    {% for cart_item in cart_list %}
+    {% for cart_item in cartitem_list %}
         <h1>{{ cart_item.item.category }} - {{ cart_item.item.name }}
             {% if cart_item.item.size %}({{ cart_item.item.size }}){% endif %}
             * {{ cart_item.quantity }} </h1>
@@ -31,7 +31,7 @@
 <form action="{% url 'order_first' %}", method="POST">
 {% csrf_token %}
     <input hidden name="user_id" value="{{ request.user.id }}">
-    <input hidden name="count_cart_items" value="{{ cart_list|length }}">
+    <input hidden name="count_cart_items" value="{{ cartitem_list|length }}">
     <input type="submit" value="Place Order">
 </form>
 {% else %}

@@ -37,20 +37,17 @@ class IndexView(TemplateView):
 
 class ItemDetail(DetailView):
     model = Item
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["toppings"] = Topping.objects.all()
-        context["extras"] = Extra.objects.all()
-        return context
+    extra_context = {
+        "toppings": Topping.objects.all(),
+        "extras": Extra.objects.all()
+    }
 
 class CartItemList(ListView):
     model = CartItem
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["cart_list"] = CartItem.objects.filter(user=self.request.user).all()
-        return context
+    
+    def get_queryset(self):
+        cartitem_list = CartItem.objects.filter(user=self.request.user).all()
+        return cartitem_list
 
 class AddItem(View):
     model = Item
@@ -203,7 +200,9 @@ def order_result(request):
     return render(request, 'orders/orderResult.html', {"success": True})
 
 class OrderList(ListView):
-    model = Order
+    def get_queryset(self):
+        orders = Order.objects.filter(user=self.request.user).order_by('-order_time')
+        return orders
 
     def post(self, request):
         try:
@@ -216,18 +215,12 @@ class OrderList(ListView):
         except:
             return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["orders"] = Order.objects.filter(user=self.request.user).order_by('-order_time')
-        return context
-
 class OrderDetail(DetailView):
     model = Order
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["order"] = Order.objects.get(pk=self.kwargs['pk'], user=self.request.user)    
-        return context
+
+    def get_object(self):
+        order = Order.objects.get(pk=self.kwargs['pk'], user=self.request.user)    
+        return order
 
 class ManageOrder(PermissionRequiredMixin, ListView):
     permission_required = 'orders.can_manage'

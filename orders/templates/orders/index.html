@@ -1,6 +1,6 @@
-{% extends 'base_orders.html' %}
+{% extends "base_orders.html" %}
 
-{% block body %}
+{% block content %}
 
 {% if request.user.is_superuser %}
     <a href="{% url 'manage_order' %}">Manage Orders</a>
@@ -15,6 +15,7 @@
     <a href="{% url 'login' %}">Login</a>
     <a href="{% url 'register' %}">Register</a>
 {% endif %}
+    <a href="{% url 'review_list' %}">Reviews</a>
 
 <h1>Regular Pizzas</h1>
 <table>
