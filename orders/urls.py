@@ -6,7 +6,7 @@ urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('item/<int:pk>', views.ItemDetail.as_view(), name='item_detail'),
     path('cart', login_required(views.CartItemList.as_view(), login_url='/login'), name='cart'),
-    path('cart/add/<int:pk>', views.add_item, name='add_item'), #FBV
+    path('cart/add/<int:pk>', login_required(views.AddItem.as_view(), login_url='/login'), name='add_item'),
     path('cart/delete/<int:pk>', login_required(views.DeleteItem.as_view(), login_url='/login'), name='delete_item'),
     path('order/orderStepFirst', views.order_first, name='order_first'), #FBV
     path('order/orderConfirm', views.order_confirm, name='order_confirm'), #FBV

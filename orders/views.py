@@ -4,9 +4,9 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, HttpResponseForbidden
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, reverse_lazy
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, View
 from django.views.generic import DetailView, ListView, DeleteView
 
 from .models import Item, Pizza, Topping, Sub, Extra, Pasta, Salad, Dinner, CartItem, OrderItem, Order
@@ -52,54 +52,55 @@ class CartItemList(ListView):
         context["cart_list"] = CartItem.objects.filter(user=self.request.user).all()
         return context
 
-@login_required(login_url='/login')
-def add_item(request, pk):
-    if request.method == 'GET':
+class AddItem(View):
+    model = Item
+
+    def get(self, request, *args, **kwargs):
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    try:
-        item = Item.objects.get(pk=pk)
-    except KeyError:
-        return HttpResponseNotFound('<h1>Page not found</h1>')
-    except Item.DoesNotExist:
-        return HttpResponseNotFound('<h1>Page not found</h1>')
+    def post(self, request, *args, **kwargs):
+        item = get_object_or_404(Item, pk=self.kwargs['pk'])
+        
+        # Get form values
+        topping1_id = request.POST.get('topping1', False)
+        topping2_id = request.POST.get('topping2', False)
+        topping3_id = request.POST.get('topping3', False)
+        extra_id = request.POST.get('extra', False)
+        quantity = int(request.POST['quantity'])
 
-    # Get form values
-    topping1_id = request.POST.get('topping1', False)
-    topping2_id = request.POST.get('topping2', False)
-    topping3_id = request.POST.get('topping3', False)
-    extra_id = request.POST.get('extra', False)
-    quantity = int(request.POST['quantity'])
+        price = quantity * item.price
 
-    price = quantity * item.price
+        try:
+            cart_item = CartItem.objects.create(user=request.user, item=item, quantity=quantity)
 
-    try:
-        cart_item = CartItem.objects.create(user=request.user, item=item, quantity=quantity)
+            # If the item has any toppings on it.
+            if topping1_id:
+                topping1 = Topping.objects.get(pk=topping1_id)
+                cart_item.toppings.add(topping1)
+            if topping2_id:
+                topping2 = Topping.objects.get(pk=topping2_id)
+                cart_item.toppings.add(topping2)
+            if topping3_id:
+                topping3 = Topping.objects.get(pk=topping3_id)
+                cart_item.toppings.add(topping3)
 
-        # If the item has any toppings on it.
-        if topping1_id:
-            topping1 = Topping.objects.get(pk=topping1_id)
-            cart_item.toppings.add(topping1)
-        if topping2_id:
-            topping2 = Topping.objects.get(pk=topping2_id)
-            cart_item.toppings.add(topping2)
-        if topping3_id:
-            topping3 = Topping.objects.get(pk=topping3_id)
-            cart_item.toppings.add(topping3)
+            # If the item has extra,
+            if extra_id:
+                extra = Extra.objects.get(pk=extra_id)
+                cart_item.extra = True
+                price = price + (quantity * extra.price)
 
-        # If the item has extra,
-        if extra_id:
-            extra = Extra.objects.get(pk=extra_id)
-            cart_item.extra = True
-            price = price + (quantity * extra.price)
+            cart_item.price = price
+            cart_item.save()
+        except:
+            cart_item.delete()
+            return HttpResponseNotFound('<h1>Page not found</h1>')
 
-        cart_item.price = price
-        cart_item.save()
-    except:
-        cart_item.delete()
-        return HttpResponseNotFound('<h1>Page not found</h1>')
+        return HttpResponseRedirect(reverse('cart'))
 
-    return HttpResponseRedirect(reverse('cart'))
+class DeleteItem(DeleteView):
+    model = CartItem
+    success_url = reverse_lazy('cart')
 
 @login_required(login_url='/login')
 def order_first(request):
@@ -227,10 +228,6 @@ class OrderDetail(DetailView):
         context = super().get_context_data(**kwargs)
         context["order"] = Order.objects.get(pk=self.kwargs['pk'], user=self.request.user)    
         return context
-
-class DeleteItem(DeleteView):
-    model = CartItem
-    success_url = reverse_lazy('cart')
 
 class ManageOrder(PermissionRequiredMixin, ListView):
     permission_required = 'orders.can_manage'

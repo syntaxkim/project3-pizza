@@ -16,7 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+import orders.urls as orders_urls
+import reviews.urls as reviews_urls
+
 urlpatterns = [
-    path('', include('orders.urls')),
     path('admin/', admin.site.urls),
+]
+
+urlpatterns += [
+    path('', include(orders_urls)),
+    path('reviews/', include(reviews_urls)),
 ]
