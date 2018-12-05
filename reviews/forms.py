@@ -1,6 +1,7 @@
 from django import forms
-from .models import Review
 from django.utils.translation import gettext_lazy as _
+
+from .models import Review
 
 # Create your forms here.
 class ReviewForm(forms.ModelForm):
@@ -12,14 +13,14 @@ class ReviewForm(forms.ModelForm):
         #     'content': forms.Textarea,
         #     'image': forms.ImageField,
         # }
-        # labels = {
-        #     'content': _('Content'),
-        # }
-        # help_texts = {
-        #     'content': _('Write the review.')
-        # }
-        # error_messages = {
-        #     'title': {
-        #         'max_length': _("The title is too long.")
-        #     }
-        # }
+        labels = {
+            'content': _('Content'),
+        }
+        help_texts = {
+            'content': _('Write the review.')
+        }
+        error_messages = {
+            'title': {
+                'max_length': _("The title is too long.")
+            }
+        }

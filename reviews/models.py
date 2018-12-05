@@ -10,7 +10,6 @@ class Review(models.Model):
     content = models.TextField()
     image = models.ImageField(blank=True, null=True)
     time_created = models.DateTimeField(default=timezone.now)
-    # files = models.FilePathField()
 
     def __str__(self):
-        return f"{self.user} {self.time_created}"
+        return f"{self.user} {self.title} {self.time_created}"

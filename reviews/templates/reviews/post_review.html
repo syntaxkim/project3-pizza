@@ -4,7 +4,9 @@
 
 <form action="{% url 'post_review' %}", method="POST">
 {% csrf_token %}
-    {{ review_form }}
+    {{ review_form.title }}
+    {{ review_form.content }}
+    {{ review_form.image }}
     <input type="submit" value="Submit">
 </form>
 

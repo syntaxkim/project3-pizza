@@ -1,0 +1,11 @@
+{% extends 'base_reviews.html' %}
+
+{% block body %}
+
+<h1>REVIEWS</h1>
+
+{% for review in reviews %}
+<li>{{ review }}</li>
+{% endfor %}
+
+{% endblock %}
