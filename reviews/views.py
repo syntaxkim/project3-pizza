@@ -1,8 +1,7 @@
-from django.shortcuts import render, get_list_or_404, get_object_or_404
+from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView, DeleteView, View
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 from .models import Review
 from .forms import ReviewForm
