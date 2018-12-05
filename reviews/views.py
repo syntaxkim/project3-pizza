@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from django.views.generic import DetailView, ListView, DeleteView
+from django.views.generic import DetailView, ListView, DeleteView, View
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 from .models import Review
 from .forms import ReviewForm
@@ -13,22 +14,22 @@ from .forms import ReviewForm
 # Load reviews with django paginator.
 class ReviewList(ListView):
     model = Review
-    paginate_by = 5
+    paginate_by = 15
     ordering = ['-time_created']
 
 # Return a review
 class ReviewDetail(DetailView):
     model = Review
 
-def post_review(request):
-    if request.method == 'GET':
-        # Load form page.
+class PostReview(View):
+    # Load form page.
+    def get(self, request, *args, **kwargs):
         context = {"review_form": ReviewForm}
         return render(request, 'reviews/post_review.html', context)
 
     # Create a review
-    if request.method == 'POST':
-        form = ReviewForm(request.POST)
+    def post(self, request, *args, **kwargs):
+        form = ReviewForm(request.POST, request.FILES or None)
 
         if form.is_valid():
             title = form.cleaned_data['title']

@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<form action="{% url 'post_review' %}", method="POST">
+<form action="{% url 'post_review' %}" method="POST" enctype="multipart/form-data">
 {% csrf_token %}
     {{ review_form.title }}
     {{ review_form.content }}

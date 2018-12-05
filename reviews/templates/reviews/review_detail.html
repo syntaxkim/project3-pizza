@@ -6,8 +6,10 @@
 
 <p>{{ review.user}}</p>
 <p>{{ review.title }}</p>
+{% if review.image %}
+<p><img src="{{ review.image.url }}"></p>
+{% endif %}
 <p>{{ review.content }}</p>
-<p><img src="{{ review.image }}" alt="{{ review.image }}"></p>
 
 <a href="{% url 'review_list' %}">Go back to list</a>
 

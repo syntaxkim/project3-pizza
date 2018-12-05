@@ -8,11 +8,11 @@ class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
         fields = ['title', 'content', 'image']
-        # widgets = {
-        #     'title': forms.TextInput,
-        #     'content': forms.Textarea,
-        #     'image': forms.ImageField,
-        # }
+        widgets = {
+            'image': forms.FileInput(
+                attrs={'accept': 'image/*'}
+            ),
+        }
         labels = {
             'content': _('Content'),
         }

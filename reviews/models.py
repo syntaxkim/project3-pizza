@@ -8,7 +8,7 @@ class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_DEFAULT, default='deleted user', related_name='reviews')
     title = models.CharField(max_length=40)
     content = models.TextField()
-    image = models.ImageField(blank=True, null=True)
+    image = models.ImageField(upload_to='reviews/photos', blank=True, null=True)
     time_created = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
