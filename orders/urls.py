@@ -21,9 +21,9 @@ urlpatterns = [
     path('logout', views.logout_view, name='logout'), #FBV
 ]
 
-# urlpatterns for function-based views
+# urlpatterns for function-based views only
 """
-urlpatterns_FBV = [
+urlpatterns = [
     path('', views.index, name='index'),
     path('register', views.register, name='register'),
     path('login', views.login_view, name='login'),

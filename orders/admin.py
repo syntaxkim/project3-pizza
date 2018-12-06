@@ -3,6 +3,12 @@ from orders.models import Category, Pizza, Topping, Sub, Extra, Pasta, Salad, Di
 
 # Register your models here.
 
+class OrderAdmin(admin.ModelAdmin):
+    filter_horizontal = ("items",)
+
+class ToppingAdmin(admin.ModelAdmin):
+    filter_horizontal = ("toppings",)
+
 # Category
 admin.site.register(Category)
 
@@ -16,8 +22,8 @@ admin.site.register(Salad)
 admin.site.register(Dinner)
 
 # Cart
-admin.site.register(CartItem)
+admin.site.register(CartItem, ToppingAdmin)
 
 # Order
-admin.site.register(Order)
-admin.site.register(OrderItem)
+admin.site.register(Order, OrderAdmin)
+admin.site.register(OrderItem, ToppingAdmin)
