@@ -22,10 +22,10 @@ import orders.urls as orders_urls
 import reviews.urls as reviews_urls
 
 urlpatterns = [
+    path('', include(orders_urls)),
     path('admin/', admin.site.urls),
 ]
 
 urlpatterns += [
-    path('', include(orders_urls)),
     path('reviews/', include(reviews_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

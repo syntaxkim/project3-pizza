@@ -53,6 +53,9 @@ class Item(models.Model):
     def __str__(self):
         return f"{self.category}: {self.name} _ {self.price}"
 
+    def is_valid_item(self):
+        return (self.price >= 0)
+
 class Pizza(Item):
     """Define pizzas."""
     REGULAR = 'Regular'
@@ -118,6 +121,9 @@ class CartItem(models.Model):
     def __str__(self):
         return f"{self.user} {self.item} {self.quantity}"
 
+    def is_valid_cartitem(self):
+        return (self.price > 0) and (self.quantity > 0)
+
 class OrderItem(models.Model):
     """Order placed items"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -129,6 +135,9 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.user} {self.item} {self.quantity}"
+
+    def is_valid_orderitem(self):
+        return (self.price > 0) and (self.quantity > 0)
 
 class Order(models.Model):
     """Order summary""" # A set of order placed items
@@ -153,3 +162,6 @@ class Order(models.Model):
 
     def __str__(self):
         return f"{self.user} {self.contact} {self.order_time} {self.status} {self.recieved}"
+
+    def is_valid_order(self):
+        return (self.subtotal > 0)
