@@ -11,8 +11,8 @@ class OrdersTestCase(TestCase):
     def setUp(self):
 
         # Create users.
-        user_1 = User.objects.create(username='User_1', password='password')
-        user_2 = User.objects.create(username='User_2', password='password')
+        user_1 = User.objects.create(username='User_1', password='passw0rd')
+        user_2 = User.objects.create(username='User_2', password='passw0rd')
 
         # Create items.
         pizza = Category.objects.create(name='Pizza')
@@ -20,7 +20,7 @@ class OrdersTestCase(TestCase):
         item_1 = Item.objects.create(category=pizza, name='Item_1', price=10000)
         item_2 = Item.objects.create(category=pizza, name='Item_2', price=0)
         item_3 = Item.objects.create(category=pizza, name='Item_3', price=-10000)
-        topping_1 = Item.objects.create(category=topping, name='topping_1')
+        Item.objects.create(category=topping, name='topping_1')
 
         # Create cartitems.
         CartItem.objects.create(user=user_1, item=item_1, quantity=1, price=item_1.price)
@@ -30,7 +30,7 @@ class OrdersTestCase(TestCase):
         # Create orderitems
         orderitem_1 = OrderItem.objects.create(user=user_2, item=item_1, quantity=1, price=item_1.price)
         orderitem_2 = OrderItem.objects.create(user=user_2, item=item_2, quantity=1, price=item_2.price)
-        orderitem_3 = OrderItem.objects.create(user=user_2, item=item_3, quantity=1, price=item_3.price)
+        OrderItem.objects.create(user=user_2, item=item_3, quantity=1, price=item_3.price)
 
         # Create an order
         order_1 = Order.objects.create(
