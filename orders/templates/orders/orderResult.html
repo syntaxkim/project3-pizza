@@ -2,13 +2,14 @@
 
 {% block content %}
 
-<h1>{% if success %}
+<h1 class="text-center">
+    {% if success %}
         Order has been successfully placed.
     {% else %}
         Order has been failed.
     {% endif %}
 </h1>
 
-<a href="{% url 'index' %}">Go back to menu.</a>
+<a href="{% url 'index' %}">Go back to menu</a>
 
 {% endblock %}

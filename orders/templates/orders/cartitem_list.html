@@ -1,41 +1,68 @@
 {% extends "base_orders.html" %}
 
 {% block content %}
+<h1>Cart</h1>
 
 {% if cartitem_list %}
-<p>
-    {% for cart_item in cartitem_list %}
-        <h1>{{ cart_item.item.category }} - {{ cart_item.item.name }}
-            {% if cart_item.item.size %}({{ cart_item.item.size }}){% endif %}
-            * {{ cart_item.quantity }} </h1>
-        <div>&#8361;{{ cart_item.price }}</div>
-        
-        {% if cart_item.item.category.name == 'Pizza' %}
-            <li>Crust: {{ cart_item.item.pizza.crust }} </li>
-            {% if cart_item.toppings.all|length >= 1 %}
-                <li>Topping{{ cart_item.toppings.all|pluralize }}: 
-                {% for topping in cart_item.toppings.all %}
-                    <li>{{ topping.name }}</li>
-                {% endfor %}
-                </li>
-            {% endif %}
-        {% elif cart_item.extra %}
-            <li>+ Extra Cheese</li>
-        {% endif %}
-        <form action="{% url 'delete_item' cart_item.id %}" method="POST">
-        {% csrf_token %}
-            <input type="submit" value="Delete">
-        </form>
-    {% endfor %}
-</p>
+<table class="table">
+    <colgroup>
+        <col width="30%"></col>
+        <col width="10%"></col>
+        <col width="10%"></col>
+        <col width="10%"></col>
+        <col width="30%"></col>
+        <col width="10%"></col>
+    </colgroup>
+    <thread>
+        <tr>
+            <th>Item</th>
+            <th>Size</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Option</th>
+            <td></td>
+        </tr>
+    </thread>
+    <tbody>
+        {% for cartitem in cartitem_list %}
+        <tr>
+            <td>{% if cartitem.item.pizza.crust %}{{ cartitem.item.pizza.crust}} Pizza with {% endif %}
+                {{ cartitem.item.name }}</td>
+            <td>{{ cartitem.item.size }}</td>
+            <td>{{ cartitem.quantity }}</td>
+            <td>{{ cartitem.price }}</td>
+            <td>{% if cartitem.toppings.count > 0 %}
+                    {% for topping in cartitem.toppings.all %}
+                        {% if forloop.last %}
+                            {{ topping.name }}
+                        {% else %}
+                            {{ topping.name }},
+                        {% endif %}
+                    {% endfor %}
+                    {% elif cartitem.extra %}
+                        + Extra Cheese
+                {% endif %}</td>
+            <td>
+                <form action="{% url 'delete_item' cartitem.id %}" method="POST">
+                {% csrf_token %}
+                <input type="submit" value="Remove" class="btn btn-sm">
+                </form></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h3 class="text-right">Subtotal: {{ subtotal }}</h3>
+{% else %}
+    <h3>No items in the cart.</h3>
+{% endif %}
+
+{% if cartitem_list %}
 <form action="{% url 'order_first' %}", method="POST">
 {% csrf_token %}
     <input hidden name="user_id" value="{{ request.user.id }}">
     <input hidden name="count_cart_items" value="{{ cartitem_list|length }}">
-    <input type="submit" value="Place Order">
+    <input type="submit" value="Order" class="btn btn-info">
 </form>
-{% else %}
-    <div>No items in the cart.</div>
 {% endif %}
 
 <a href="{% url 'index' %}">Go back to menu.</a>

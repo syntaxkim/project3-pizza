@@ -45,9 +45,17 @@ class ItemDetail(DetailView):
 class CartItemList(ListView):
     model = CartItem
     
-    def get_queryset(self):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         cartitem_list = CartItem.objects.filter(user=self.request.user).all()
-        return cartitem_list
+        subtotal = 0
+        for cartitem in cartitem_list:
+            subtotal += cartitem.price
+        context = {
+            "cartitem_list": cartitem_list,
+            "subtotal": subtotal
+        }
+        return context
 
 class AddItem(View):
     model = Item
@@ -104,20 +112,20 @@ def order_first(request):
     if request.method == 'GET':
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    cart_items = CartItem.objects.filter(user=request.user)
+    cartitem_list = CartItem.objects.filter(user=request.user)
     
     # Some sanity checks
     if int(request.POST['user_id']) is not request.user.id:
         return HttpResponseNotFound('<h1>Page not found</h1>')
-    elif int(request.POST['count_cart_items']) is not len(list(cart_items)):
+    elif int(request.POST['count_cart_items']) is not len(cartitem_list):
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
     subtotal = 0
-    for cart_item in cart_items:
-        subtotal += cart_item.price
+    for cartitem in cartitem_list:
+        subtotal += cartitem.price
 
     context = {
-        "cart_items": cart_items,
+        "cartitem_list": cartitem_list,
         "subtotal": subtotal
     }
 

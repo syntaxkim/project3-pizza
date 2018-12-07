@@ -1,22 +1,30 @@
 {% extends "base_orders.html" %}
 
+{% block head %}
+{% load static %}
+<script src="{% static 'orders/order.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
 <h1>Confirm your order.</h1>
-<li>Subtotal: {{ subtotal }}</li>
-<li>Contact: {{ contact }}</li>
-<li>Billing Address: {{ billing_address }}</li>
-<li>Shipping Address: {{ shipping_address }}</li>
-<li>Message: {{ message }}</li>
 
-<form action="{% url 'place_order' %}", method="POST">
+<ul class="list-group">
+    <li class="list-group-item">Subtotal: {{ subtotal }}</li>
+    <li class="list-group-item">Contact: {{ contact }}</li>
+    <li class="list-group-item">Billing Address: {{ billing_address }}</li>
+    <li class="list-group-item">Shipping Address: {{ shipping_address }}</li>
+    <li class="list-group-item">Message: {{ message }}</li>
+</ul>
+
+<form id="order" action="{% url 'place_order' %}", method="POST">
 {% csrf_token %}
     <input hidden name="user_id" value="{{ request.user.id }}">
     <input hidden name="contact" value="{{ contact }}">
     <input hidden name="billing_address" value="{{ billing_address }} ">
     <input hidden name="shipping_address" value="{{ shipping_address }}">
     <input hidden name="message" value="{{ message }}">
-    <input type="submit" value="Place Order">
+    <input type="submit" value="Place Order" class="btn btn-info">
 </form>
 
 {% endblock %}
