@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic.base import TemplateView, View
-from django.views.generic import DetailView, ListView, DeleteView
+from django.views.generic import DetailView, ListView, DeleteView, RedirectView
 
 from .models import Item, Pizza, Topping, Sub, Extra, Pasta, Salad, Dinner, CartItem, OrderItem, Order
 

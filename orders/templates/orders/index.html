@@ -1,95 +1,120 @@
 {% extends "base_orders.html" %}
 
+{% block title %}{{ block.super }} - Menu{% endblock %}
+
 {% block content %}
 
-{% if request.user.is_superuser %}
-    <a href="{% url 'manage_order' %}">Manage Orders</a>
-    <a href="/admin">Admin</a>
-{% endif %}
-{% if request.user.is_authenticated %}
-    <div>Hello, {{ user }}</div>
-    <a href="{% url 'logout' %}">Logout</a>
-    <a href="{% url 'cart' %}">Cart</a>
-    <a href="{% url 'order_list' %}">Order</a>
-{% else %}
-    <a href="{% url 'login' %}">Login</a>
-    <a href="{% url 'register' %}">Register</a>
-{% endif %}
-    <a href="{% url 'review_list' %}">Reviews</a>
+<h1 class="text-center">Menu</h1>
 
-<h1>Regular Pizzas</h1>
-<table>
-    <tr>
-        <th></th>
-        <th>Small</th>
-        <th>Large</th>
-    </tr>
+<nav class="navbar sticky-top navbar-light bg-light">
+    <a class="navbar-brand" href="#regular_pizzas">Regular Pizzas</a>
+    <a class="navbar-brand" href="#sicilian_pizza">Sicilian Pizzas</a>
+    <a class="navbar-brand" href="#toppings">Toppings</a>
+    <a class="navbar-brand" href="#subs">Subs</a>
+    <a class="navbar-brand" href="#pastas">Pastas</a>
+    <a class="navbar-brand" href="#salads">Salads</a>
+    <a class="navbar-brand" href="#dinners">Dinner Platters</a>
+</nav>
+<br>
+<h2 id="regular_pizzas">Regular Pizzas</h2>
+<table class="table">
+    <colgroup>
+        <col width="50%"></col>
+        <col width="25%"></col>
+        <col width="25%"></col>
+    </colgroup>
+    <thread>
+        <tr>
+            <th></th>
+            <th>Small</th>
+            <th>Large</th>
+        </tr>
+    </thread>
+    <tbody>
     {% for regular_pizza in regular_pizzas %}
-    <tr>
-        <td>{{ regular_pizza.name }}</td>
-        <td>{{ regular_pizza.price_small }} <a href="{% url 'item_detail' regular_pizza.id_small %}">Add to Cart</a></td>
-        <td>{{ regular_pizza.price_large }} <a href="{% url 'item_detail' regular_pizza.id_large %}">Add to Cart</a></td>
-    </tr>
+        <tr>
+            <td>{{ regular_pizza.name }}</td>
+            <td>{{ regular_pizza.price_small }} <a href="{% url 'item_detail' regular_pizza.id_small %}">Add to Cart</a></td>
+            <td>{{ regular_pizza.price_large }} <a href="{% url 'item_detail' regular_pizza.id_large %}">Add to Cart</a></td>
+        </tr>
     {% endfor %}
+    </tbody>
 </table>
-
-<h1>Sicilian Pizzas</h1>
-<table>
-    <tr>
-        <th></th>
-        <th>Small</th>
-        <th>Large</th>
-    </tr>
+<br>
+<h2 id="sicilian_pizza">Sicilian Pizzas</h2>
+<table class="table">
+    <colgroup>
+        <col width="50%"></col>
+        <col width="25%"></col>
+        <col width="25%"></col>
+    </colgroup>
+    <thread>
+        <tr>
+            <th></th>
+            <th>Small</th>
+            <th>Large</th>
+        </tr>
+    </thread>
+    <tbody>
     {% for sicilian_pizza in sicilian_pizzas %}
-    <tr>
-        <td>{{ sicilian_pizza.name }}</td>
-        <td>{{ sicilian_pizza.price_small }} <a href="{% url 'item_detail' sicilian_pizza.id_small %}">Add to Cart</a></td>
-        <td>{{ sicilian_pizza.price_large }} <a href="{% url 'item_detail' sicilian_pizza.id_large %}">Add to Cart</a></td>
-    </tr>
+        <tr>
+            <td>{{ sicilian_pizza.name }}</td>
+            <td>{{ sicilian_pizza.price_small }} <a href="{% url 'item_detail' sicilian_pizza.id_small %}">Add to Cart</a></td>
+            <td>{{ sicilian_pizza.price_large }} <a href="{% url 'item_detail' sicilian_pizza.id_large %}">Add to Cart</a></td>
+        </tr>
     {% endfor %}
+    </tbody>
 </table>
-
-<h1>Toppings</h1>
-<table>
-    <tr>
-        <th></th>
-    </tr>
+<br>
+<h2 id="toppings">Toppings</h2>
+<table class="table table-sm">
     {% for topping in toppings %}
     <tr>
         <td>{{ topping.name }}</td>
     </tr>
     {% endfor %}
 </table>
-
-<h1>Subs</h1>
-<table>
-    <tr>
-        <th></th>
-        <th>Small</th>
-        <th>Large</th>
-    </tr>
+<br>
+<h2 id="subs">Subs</h2>
+<table class="table">
+    <colgroup>
+        <col width="50%"></col>
+        <col width="25%"></col>
+        <col width="25%"></col>
+    </colgroup>
+    <thread>
+        <tr>
+            <th></th>
+            <th>Small</th>
+            <th>Large</th>
+        </tr>
+    </thread>
+    <tbody>
     {% for sub in subs %}
-    <tr>
-        <td>{{ sub.name }}</td>
-        <td>{{ sub.price_small }} <a href="{% url 'item_detail' sub.id_small %}">Add to Cart</a></td>
-        <td>{{ sub.price_large }} <a href="{% url 'item_detail' sub.id_large %}">Add to Cart</a></td>
-    </tr>
+        <tr>
+            <td>{{ sub.name }}</td>
+            <td>{{ sub.price_small }} <a href="{% url 'item_detail' sub.id_small %}">Add to Cart</a></td>
+            <td>{{ sub.price_large }} <a href="{% url 'item_detail' sub.id_large %}">Add to Cart</a></td>
+        </tr>
     {% endfor %}
+    </tbody>
+    <tbody>
     {% for extra in extras %}
-    <tr>
-        <td>{{ extra.name }} on any sub</td>
-        <td>+{{ extra.price }}</td>
-        <td>+{{ extra.price }}</td>
-    </tr>
+        <tr>
+            <td>{{ extra.name }} on any sub</td>
+            <td>+{{ extra.price }}</td>
+            <td>+{{ extra.price }}</td>
+        </tr>
     {% endfor %}
+    </tbody>
 </table>
-
-<h1>Pasta</h1>
-<table>
-    <tr>
-        <th></th>
-        <th></th>
-    </tr>
+<br>
+<h2 id="pastas">Pasta</h2>
+<table class="table">
+    <colgroup>
+        <col width="50%"></col>
+        <col width="25%"></col>
+    </colgroup>
     {% for pasta in pastas %}
     <tr>
         <td>{{ pasta.name }}</td>
@@ -97,13 +122,13 @@
     </tr>
     {% endfor %}
 </table>
-
-<h1>Salads</h1>
-<table>
-    <tr>
-        <th></th>
-        <th></th>
-    </tr>
+<br>
+<h2 id="salads">Salads</h2>
+<table class="table">
+    <colgroup>
+        <col width="50%"></col>
+        <col width="25%"></col>
+    </colgroup>
     {% for salad in salads %}
     <tr>
         <td>{{ salad.name }}</td>
@@ -111,21 +136,31 @@
     </tr>
     {% endfor %}
 </table>
-
-<h1>Dinner Platters</h1>
-<table>
-    <tr>
-        <th></th>
-        <th>Small</th>
-        <th>Large</th>
-    </tr>
+<br>
+<h2 id="dinners">Dinner Platters</h2>
+<table class="table">
+    <colgroup>
+        <col width="50%"></col>
+        <col width="25%"></col>
+        <col width="25%"></col>
+    </colgroup>
+    <thread>
+        <tr>
+            <th></th>
+            <th>Small</th>
+            <th>Large</th>
+        </tr>
+    </thread>
+    <tbody>
     {% for dinner in dinners %}
-    <tr>
-        <td>{{ dinner.name }}</td>
-        <td>{{ dinner.price_small }} <a href="{% url 'item_detail' dinner.id_small %}">Add to Cart</a></td>
-        <td>{{ dinner.price_large }} <a href="{% url 'item_detail' dinner.id_large %}">Add to Cart</a></td>
-    </tr>
+        <tr>
+            <td>{{ dinner.name }}</td>
+            <td>{{ dinner.price_small }} <a href="{% url 'item_detail' dinner.id_small %}">Add to Cart</a></td>
+            <td>{{ dinner.price_large }} <a href="{% url 'item_detail' dinner.id_large %}">Add to Cart</a></td>
+        </tr>
     {% endfor %}
+    </tbody>
 </table>
+<br>
 
 {% endblock %}
