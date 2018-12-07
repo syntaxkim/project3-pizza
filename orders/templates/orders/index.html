@@ -2,10 +2,14 @@
 
 {% block title %}{{ block.super }} - Menu{% endblock %}
 
+{% block head %}
+{% load static %}
+<script src="{% static 'orders/menu.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
 <h1 class="text-center">Menu</h1>
-
 <nav class="navbar sticky-top navbar-light bg-light">
     <a class="navbar-brand" href="#regular_pizzas">Regular Pizzas</a>
     <a class="navbar-brand" href="#sicilian_pizza">Sicilian Pizzas</a>
@@ -15,6 +19,9 @@
     <a class="navbar-brand" href="#salads">Salads</a>
     <a class="navbar-brand" href="#dinners">Dinner Platters</a>
 </nav>
+
+<button id="top" style="right:10px;bottom:10px" class="btn btn-light position-fixed">Top</button>
+
 <br>
 <h2 id="regular_pizzas">Regular Pizzas</h2>
 <table class="table">
