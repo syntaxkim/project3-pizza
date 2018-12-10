@@ -1,37 +1,105 @@
 {% extends "base_orders.html" %}
 
+{% block head %}
+{% load static %}
+<script src="{% static 'orders/manageorder_list.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
 <h1>{{ today }}</h1>
-<h1>Order List</h1>
 
 <br>
-<h1>Recently Ordered Items</h1>
-{% for order in orders %}
-    {% if not order.recieved %}
-        <li><a href="{% url 'manage_order_detail' order.id %}">{{ order.order_time }}</a></li>
-        <form action="{% url 'manage_order' %}", method="POST">
-        {% csrf_token %}
-            <input hidden name="order_id" value="{{ order.id }}">
-            <select name="status">
-                <option value="Ordered">Ordered</option>
-                <option value="On Shipping">On Shipping</option>
-                <option value="Delivered">Delivered</option>
-            </select>
-            <input type="submit" value="Update">
-        </form>
-    {% endif %}
-{% endfor %}
+<h1>Recently Ordered</h1>
+<table class="table">
+    <colgroup>
+        <col width="20%">
+        <col width="20%">
+        <col width="20%">
+        <col width="20%">
+        <col width="20%">
+    </colgroup>
+    <thread>
+        <tr>
+            <th>Order Placed</th>
+            <th>Customer</th>
+            <th>Subtotal</th>
+            <th>Status</th>
+            <th>Complete</th>
+        </tr>
+    </thread>
+    <tbody>
+        {% for order in order_list %}
+        {% if not order.recieved %}
+            <tr>
+                <td>{{ order.order_time }}</td>
+                <td><a href="{% url 'manage_order_detail' order.id %}">{{ order.user.username }}</a></td>
+                <td>{{ order.subtotal }}</td>
+                <td>{{ order.status }}</td>
+                <td>
+                    <form class="update_status" action="{% url 'manage_order' %}", method="POST">
+                    {% csrf_token %}
+                    <input hidden name="order_id" value="{{ order.id }}">
+                    <div class="input-group">    
+                        <select class="custom-select" name="status">
+                            {% if order.status == 'Ordered' %}
+                                <option selected value="On Shipping">On Shipping</option>
+                                <option value="Delivered">Delivered</option>
+                            {% else %}
+                                <option value="On Shipping">On Shipping</option>
+                                <option selected value="Delivered">Delivered</option>
+                            {% endif %}
+                        </select>
+                        <div class="input-group-append">
+                            <input class="btn btn-outline-info" type="submit" value="Update">
+                        </div>
+                    </div>
+                    </form>
+                </td>
+            </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if not order_list %}
+<h3>No orders have been made.</h3>
+{% endif %}
 
 <br>
 <h1>Completed Orders</h1>
-{% for order in orders %}
-    {% if order.recieved %}
-        <li><a href="{% url 'manage_order_detail' order.id %}">{{ order.order_time }}</a></li>
-    {% endif %}
-{% endfor %}
-
+<table class="table">
+    <colgroup>
+        <col width="20%">
+        <col width="20%">
+        <col width="20%">
+        <col width="20%">
+        <col width="20%">
+    </colgroup>
+    <thread>
+        <tr>
+            <th>Order Placed</th>
+            <th>Detail</th>
+            <th>Subtotal</th>
+            <th>Status</th>
+            <th>Complete</th>
+        </tr>
+    </thread>
+    <tbody>
+        {% for order in order_list %}
+        {% if order.recieved %}
+            <tr>
+                <td>{{ order.order_time }}</td>
+                <td><a href="{% url 'manage_order_detail' order.id %}">Detail</a></td>
+                <td>{{ order.subtotal }}</td>
+                <td>{{ order.status }}</td>
+                <td>Recieved</td>
+            </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
 <br>
-<a href="{% url 'index' %}">Go back to menu.</a>
+<li><a href="{% url 'index' %}">Go back to menu.</a></li>
 
 {% endblock %}

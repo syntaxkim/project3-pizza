@@ -280,15 +280,14 @@ def register(request):
     password = request.POST['password']
     confirmation = request.POST['confirmation']
 
-    # Check forms if valid.
+    # Server-side form validation
     if not username:
         return render(request, 'orders/register.html', {"message": "No username."})
     elif len(username) < 4:
         return render(request, 'orders/register.html', {"message": "Username should be longer than 4 characters."})
     elif not email:
         return render(request, 'orders/register.html', {"message": "No Email."})
-    # elif email is not valid:
-    #     pass
+    # Email validation required.
     elif not password or not confirmation:
         return render(request, 'orders/register.html', {"message": "Type your password."})
     elif len(password) < 8 or len(confirmation) < 8:
@@ -314,16 +313,25 @@ def login_view(request):
 
     username = request.POST['username']
     password = request.POST['password']
-    user = authenticate(request, username=username, password=password)
-    if user is not None:
-        login(request, user)
-        return HttpResponseRedirect(reverse('index'))
+
+    # Server-side form validation
+    if not username:
+        return render(request, 'orders/login.html', {"message": "No username."})
+    elif len(username) < 4:
+        return render(request, 'orders/login.html', {"message": "Username should be longer than 4 characters."})
+    elif not password:
+        return render(request, 'orders/login.html', {"message": "Type your password."})
     else:
-        return render(request, 'orders/login.html', {"message": "Invalid credentials."})
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            return render(request, 'orders/login.html', {"message": "Login failed."})
 
 def logout_view(request):
     logout(request)
-    return render(request, 'orders/login.html', {"message": "Logged out."})
+    return render(request, 'orders/login.html', {"message": "Successfully logged out."})
 
 def get_menu(products):
     """List each item with different sizes in a row - name, small, large"""

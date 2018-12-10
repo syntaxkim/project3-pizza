@@ -1,24 +1,52 @@
 {% extends "base_orders.html" %}
 
+{% block head %}
+{% load static %}
+<script src="{% static 'orders/order_list.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
 <h1>Order List</h1>
+<table class="table">
+    <colgroup>
+        <col width="20%">
+        <col width="20%">
+        <col width="20%">
+        <col width="20%">
+        <col width="20%">
+    </colgroup>
+    <thread>
+        <tr>
+            <th>Order Placed</th>
+            <th>Detail</th>
+            <th>Subtotal</th>
+            <th>Status</th>
+            <th>Complete</th>
+        </tr>
+    </thread>
+    <tbody>
+        {% for order in order_list %}
+        <tr>
+            <td>{{ order.order_time }}</td>
+            <td><a href="{% url 'order_detail' order.id %}">Detail</a></td>
+            <td>{{ order.subtotal }}</td>
+            <td>{{ order.status }}</td>
+            <td>
+            {% if not order.recieved %}
+                <form class="recieved" action="{% url 'order_list' %}", method="POST">
+                {% csrf_token %}
+                    <button name="recieved" class="btn btn-info" value="{{ order.id }}">Complete order</button>
+                </form>
+            {% else %}Recieved{% endif %}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 {% if not order_list %}
-    <p>No orders have been made.</p>
+<h3>No orders have been made.</h3>
 {% endif %}
-
-{% for order in order_list %}
-    <li><a href="{% url 'order_detail' order.id %}">{{ order.order_time }}</a></li>
-    {% if not order.recieved %}
-        <form action="{% url 'order_list' %}", method="POST">
-        {% csrf_token %}
-            <button name="recieved" value="{{ order.id }}">Recieved</button>
-        </form>
-        {% else %}
-            Recieved
-    {% endif %}
-{% endfor %}
 
 <br>
 <a href="{% url 'index' %}">Go back to menu.</a>

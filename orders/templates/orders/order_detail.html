@@ -2,39 +2,89 @@
 
 {% block content %}
 
-<h1>Order Detail</h1>
-
-Items
-{% for order_item in order.items.all %}
-    <li>{{ order_item.item.name }}
-    {% if order_item.toppings.all|length >= 1 %}
-        with
-        {% for topping in order_item.toppings.all %}
-            {{ topping.name }}
+{% if order %}
+<h1>Order Information</h1>
+<table class="table">
+    <colgroup>
+        <col width="30%">
+        <col width="10%">
+        <col width="10%">
+        <col width="10%">
+        <col width="30%">
+        <col width="10%">
+    </colgroup>
+    <thread>
+        <tr>
+            <th>Item</th>
+            <th>Size</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Option</th>
+            <td></td>
+        </tr>
+    </thread>
+    <tbody>
+        {% for item in order.items.all %}
+        <tr>
+            <td>{% if item.item.pizza.crust %}{{ item.item.pizza.crust}} Pizza with {% endif %}
+                {{ item.item.name }}</td>
+            <td>{{ item.item.size }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.price }}</td>
+            <td>{% if item.toppings.count > 0 %}
+                    {% for topping in item.toppings.all %}
+                        {% if forloop.last %}
+                            {{ topping.name }}
+                        {% else %}
+                            {{ topping.name }},
+                        {% endif %}
+                    {% endfor %}
+                    {% elif item.extra %}
+                        + Extra Cheese
+                {% endif %}</td>
+        </tr>
         {% endfor %}
-    {% elif order_item.extra %}
-        (+Extra Cheese)
-    {% endif %}
-    </li>
-{% endfor %}
-<br>
-<li>Subtotal: {{ order.subtotal }}</li>
-<li>Contact: {{ order.contact }}</li>
-<li>Billing Address: {{ order.billing_address }}</li>
-<li>Shipping Address: {{ order.shipping_address }}</li>
-<li>Message: {{ order.message }}</li>
-<li>Status: {{ order.status }}</li>
-<li>Recieved: {{ order.recieved }}</li>
+    </tbody>
+</table>
 
-{% if not order.recieved %}
-    <form action="{% url 'order_list' %}", method="POST">
-    {% csrf_token %}
-        <button name="recieved" value="{{ order.id }}">Recieved</button>
-    </form>
-    {% else %}
-        Recieved
+<br>
+
+<table class="table">
+    <colgroup>
+        <col width="30%">
+        <col width="70%">
+    </colgroup>
+    <tbody>
+        <tr>
+            <td>Subtotal</td>
+            <td>{{ order.subtotal }}</td>
+        </tr>
+        <tr>
+            <td>Contact</td>
+            <td>{{ order.contact }}</td>
+        </tr>
+        <tr>
+            <td>Billing Address</td>
+            <td>{{ order.billing_address }}</td>
+        </tr>
+        <tr>
+            <td>Shipping Address</td>
+            <td>{{ order.shipping_address }}</td>
+        </tr>
+        <tr>
+            <td>Message</td>
+            <td>{{ order.message }}</td>
+        </tr>
+        <tr>
+            <td>status</td>
+            <td>{{ order.status }}</td>
+        </tr>
+    </tbody>
+</table>
+
 {% endif %}
 
-<a href="{% url 'order_list' %}">Go back to my page</a>
+<li><a href="{% url 'order_list' %}">Go back to order list</a></li>
+<li><a href="{% url 'index' %}">Go back to menu</a></li>
 
 {% endblock %}
