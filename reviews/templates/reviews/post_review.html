@@ -1,8 +1,13 @@
 {% extends "base_reviews.html" %}
 
+{% block head %}
+{% load static %}
+<script src="{% static 'reviews/js/post_review.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
-<form action="{% url 'post_review' %}" method="POST" enctype="multipart/form-data">
+<form id="post" action="{% url 'post_review' %}" method="POST" enctype="multipart/form-data">
 {% csrf_token %}
     <div class="form-group">
         <label>Title</label>
@@ -14,6 +19,7 @@
         <small class="form-text text-muted">Size limit - 2.5 MB.</small>
     </div>
     <div class="row justify-content-end">
+        <h5 id="message">{% if message %}{{ message }}{% endif %}</h5>
         <input id="post" class="btn btn-outline-info align" type="submit" value="Post">
     </div>
 </form>

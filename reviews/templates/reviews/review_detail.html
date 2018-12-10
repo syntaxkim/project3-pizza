@@ -38,13 +38,12 @@
     </tbody>
 </table>
 
-<div class="row justify-content-end">
+<div class="row justify-content-between">
     <a href="{% url 'review_list' %}" class="btn btn-outline-info">Go back to review list</a>
+    <form id="delete" action="{% url 'delete_review' review.id %}" method="POST">
+    {% csrf_token %}
+        <input type="submit" value="Delete" class="btn btn-outline-info">
+    </form>
 </div>
-
-<form id="delete" action="{% url 'delete_review' review.id %}" method="POST">
-{% csrf_token %}
-    <input type="submit" value="Delete" class="btn btn-outline-info">
-</form>
 
 {% endblock %}

@@ -6,12 +6,11 @@
 <h1>Order Information</h1>
 <table class="table">
     <colgroup>
-        <col width="30%">
+        <col width="35%">
         <col width="10%">
         <col width="10%">
         <col width="10%">
-        <col width="30%">
-        <col width="10%">
+        <col width="35%">
     </colgroup>
     <thread>
         <tr>
@@ -20,7 +19,6 @@
             <th>Quantity</th>
             <th>Price</th>
             <th>Option</th>
-            <td></td>
         </tr>
     </thread>
     <tbody>
@@ -51,8 +49,8 @@
 
 <table class="table">
     <colgroup>
-        <col width="30%">
-        <col width="70%">
+        <col width="35%">
+        <col width="65%">
     </colgroup>
     <tbody>
         <tr>
@@ -84,7 +82,9 @@
 
 {% endif %}
 
-<li><a href="{% url 'manage_order' %}">Go back to order list</a></li>
-<li><a href="{% url 'index' %}">Go back to menu</a></li>
+<div class="row">
+    <a href="{% url 'index' %}" class="btn btn-outline-info">Go back to menu</a>
+    <a href="{% url 'manage_order' %}" class="btn btn-outline-info">Go back to order list (management)</a>
+</div>
 
 {% endblock %}

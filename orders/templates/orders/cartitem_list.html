@@ -57,15 +57,25 @@
     <h3>No items in the cart.</h3>
 {% endif %}
 
-{% if cartitem_list %}
-<form action="{% url 'order_first' %}", method="POST">
-{% csrf_token %}
-    <input hidden name="user_id" value="{{ request.user.id }}">
-    <input hidden name="count_cart_items" value="{{ cartitem_list|length }}">
-    <input type="submit" value="Order" class="btn btn-info">
-</form>
-{% endif %}
-
-<a href="{% url 'index' %}">Go back to menu.</a>
+<div class="row justify-content-between">
+    <a href="{% url 'index' %}" class="btn btn-outline-info">Go back to menu.</a>
+    {% if cartitem_list %}
+        <form action="{% url 'order_first' %}", method="POST">
+        {% csrf_token %}
+            <input hidden name="user_id" value="{{ request.user.id }}">
+            <input hidden name="count_cart_items" value="{{ cartitem_list|length }}">
+            <input type="submit" value="Order" class="btn btn-info">
+        </form>
+    {% endif %}
+</div>
 
 {% endblock %}
+
+
+<div class="row justify-content-between">
+    <form id="delete" action="{% url 'delete_review' review.id %}" method="POST">
+    {% csrf_token %}
+        <input type="submit" value="Delete" class="btn btn-outline-info">
+    </form>
+    <a href="{% url 'review_list' %}" class="btn btn-outline-info">Go back to review list</a>
+</div>

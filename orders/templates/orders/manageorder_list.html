@@ -99,7 +99,9 @@
         {% endfor %}
     </tbody>
 </table>
-<br>
-<li><a href="{% url 'index' %}">Go back to menu.</a></li>
+
+<div class="row">
+    <a href="{% url 'index' %}" class="btn btn-outline-info">Go back to menu.</a>
+</div>
 
 {% endblock %}

@@ -24,7 +24,8 @@ class ReviewForm(forms.ModelForm):
             'image': forms.FileInput(
                 attrs={
                     'accept': 'image/*',
-                    'class': 'form-control-file'
+                    'class': 'form-control-file',
+                    'id': 'file_image'
                 },
             )
         }
