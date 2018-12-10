@@ -40,10 +40,12 @@
 
 <div class="row justify-content-between">
     <a href="{% url 'review_list' %}" class="btn btn-outline-info">Go back to review list</a>
+    {% if review.user.id == request.user.id %}
     <form id="delete" action="{% url 'delete_review' review.id %}" method="POST">
     {% csrf_token %}
         <input type="submit" value="Delete" class="btn btn-outline-info">
     </form>
+    {% endif %}
 </div>
 
 {% endblock %}

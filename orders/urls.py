@@ -17,7 +17,7 @@ urlpatterns = [
     path('user/order', login_required(views.OrderList.as_view(), login_url='/login'), name='order_list'),
     path('user/order/<int:pk>', login_required(views.OrderDetail.as_view(), login_url='/login'), name='order_detail'),
     path('manage/order', views.ManageOrder.as_view(), name='manage_order'),
-    path('manage/order/<int:pk>', views.ManageOrderDetail.as_view(), name='manage_order_detail'),
+    path('manage/order/detail/<int:pk>', views.ManageOrderDetail.as_view(), name='manage_order_detail'),
     path('register', views.register, name='register'), #FBV
     path('login', views.login_view, name='login'), #FBV
     path('logout', views.logout_view, name='logout'), #FBV
