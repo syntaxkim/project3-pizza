@@ -4,10 +4,18 @@
 
 <form action="{% url 'post_review' %}" method="POST" enctype="multipart/form-data">
 {% csrf_token %}
-    {{ review_form.title }}
-    {{ review_form.content }}
-    {{ review_form.image }}
-    <input type="submit" value="Submit">
+    <div class="form-group">
+        <label>Title</label>
+        {{ review_form.title }}
+        <label>Content</label>
+        {{ review_form.content }}
+        <label>Photo</label>
+        {{ review_form.image }}
+        <small class="form-text text-muted">Size limit - 2.5 MB.</small>
+    </div>
+    <div class="row justify-content-end">
+        <input id="post" class="btn btn-outline-info align" type="submit" value="Post">
+    </div>
 </form>
 
 {% endblock %}

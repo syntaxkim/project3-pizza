@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, ListView, DeleteView, View
 
 from .models import Review
@@ -13,7 +13,7 @@ from .forms import ReviewForm
 # Load reviews with django paginator.
 class ReviewList(ListView):
     model = Review
-    paginate_by = 15
+    paginate_by = 10
     ordering = ['-time_created']
 
 # Return a review
@@ -39,3 +39,7 @@ class PostReview(View):
             review.save()
 
         return HttpResponseRedirect(reverse('review_detail', kwargs={'pk': review.id}))
+
+class DeleteReview(DeleteView):
+    model = Review
+    success_url = reverse_lazy('review_list')

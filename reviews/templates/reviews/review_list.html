@@ -2,19 +2,48 @@
 
 {% block content %}
 
-<h1>REVIEWS</h1>
+<h1>Reviews</h1>
 
 {% if not review_list %}
 <p>No reviews yet</p>
 {% endif %}
 
-{% for review in review_list %}
-    <li><a href="{% url 'review_detail' review.id %}">{{ review }}</a></li>
-{% endfor %}
+<table class="table table-bordered table-hover">
+    <colgroup>
+        <col width="10%">
+        <col width="50%">
+        <col width="15%">
+        <col width="15%">
+    </colgroup>
+    <thread>
+        <tr>
+            <th></th>
+            <th>Title</th>
+            <th>User</th>
+            <th>Created at</th>
+        </tr>
+    </thread>
+    <tbody>
+        {% for review in review_list %}
+            <tr>
+                <td>{{ review.id }}</td>
+                <td>
+                    <a href="{% url 'review_detail' review.id %}">{{ review.title }}
+                        {% if review.image %}{% load static %}
+                        <img src="{% static 'reviews/img/image_icon.png' %}">
+                        {% endif %}
+                    </a>
+                </td>
+                <td>{{ review.user }}</td>
+                <td>{{ review.time_created|time:'P' }} - {{ review.time_created|date:'M d' }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 {% if is_paginated %}
+<div class="row justify-content-center">
     <ul class="pagination">
-
     {% if page_obj.has_previous %}
         <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
     {% else %}
@@ -42,10 +71,12 @@
     {% else %}
         <li class="disabled page-item"><a class="page-link" href="">Next</a></li>
     {% endif %}
-
     </ul>
+</div>
 {% endif %}
 
-<a href="{% url 'post_review' %}">Write</a>
+<div class="row justify-content-end">
+    <a href="{% url 'post_review' %}" class="btn btn-outline-info">Write</a>
+</div>
 
 {% endblock %}

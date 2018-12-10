@@ -1,16 +1,50 @@
 {% extends "base_reviews.html" %}
 
+{% block head %}
+{% load static %}
+<script src="{% static 'reviews/js/review_detail.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
-<h1>Review</h1>
+<table class="table table-bordered">
+    <colgroup>
+        <col width="70%">
+        <col width="10%">
+        <col width="20%">
+    </colgroup>
+    <thread>
+        <tr>
+            <th>Title</th>
+            <th>User</th>
+            <th>Created at</th>
+        </tr>
+    </thread>
+    <tbody>
+        <tr>
+            <td>{{ review.title }}</td>
+            <td>{{ review.user }}</td>
+            <td>{{ review.time_created|time:'P' }} - {{ review.time_created|date:'M d' }}</td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                {% if review.image %}
+                    <img src="{{ review.image.url }}" alt="{{ review.image }}">
+                    <br>
+                {% endif %}
+                {{ review.content }}
+            </td>
+        </tr>
+    </tbody>
+</table>
 
-<p>{{ review.user}}</p>
-<p>{{ review.title }}</p>
-{% if review.image %}
-<p><img src="{{ review.image.url }}"></p>
-{% endif %}
-<p>{{ review.content }}</p>
+<div class="row justify-content-end">
+    <a href="{% url 'review_list' %}" class="btn btn-outline-info">Go back to review list</a>
+</div>
 
-<a href="{% url 'review_list' %}">Go back to list</a>
+<form id="delete" action="{% url 'delete_review' review.id %}" method="POST">
+{% csrf_token %}
+    <input type="submit" value="Delete" class="btn btn-outline-info">
+</form>
 
 {% endblock %}
