@@ -29,7 +29,7 @@
         </tr>
     </thread>
     <tbody>
-        {% for order in order_list %}
+        {% for order in order_list_not_recieved %}
         {% if not order.recieved %}
             <tr>
                 <td>{{ order.order_time }}</td>
@@ -62,7 +62,7 @@
     </tbody>
 </table>
 
-{% if not order_list %}
+{% if not order_list_not_recieved %}
 <h3>No orders have been made.</h3>
 {% endif %}
 

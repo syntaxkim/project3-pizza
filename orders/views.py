@@ -8,6 +8,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic.base import TemplateView, View
 from django.views.generic import DetailView, ListView, DeleteView, RedirectView
+from django.db.models import Q
 
 from .models import Item, Pizza, Topping, Sub, Extra, Pasta, Salad, Dinner, CartItem, OrderItem, Order
 
@@ -239,7 +240,7 @@ class ManageOrder(PermissionRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         today = datetime.today()
         context["today"] = today
-        context["orders"] = Order.objects.filter(order_time__day=today.day).order_by('-order_time')
+        context["order_list_not_recieved"] = Order.objects.filter(Q(order_time__day=today.day)|Q(recieved=False)).order_by('-order_time')
         return context
 
     def post(self, request, *args, **kwargs):

@@ -116,7 +116,7 @@ class OrdersTestCase(TestCase):
     def test_index(self):
         c = Client()
         response = c.get("/")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
     def test_valid_item_page(self):
         item_1 = Item.objects.get(name='Item_1')
