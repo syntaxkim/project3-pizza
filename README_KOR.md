@@ -5,7 +5,7 @@ English: [README.md](https://github.com/syntaxkim/project3-pizza/blob/master/REA
 온라인 피자 주문 및 주문관리 웹 앱입니다. 메뉴를 통해 카트에 담은 뒤 주문을 할 수 있으며, 사진 업로드와 후기 작성을 수 있습니다. 관리자는 관리 페이지에서 주문을 확인하고 상태를 갱신할 수 있습니다.
 
 ![menu](https://github.com/syntaxkim/project3-pizza/blob/master/screenshots/menu.png?raw=true)
-* The menu model comes from an actual [pizza restaurant menu](http://www.pinocchiospizza.net/menu.html) located in Cambridge, MA.
+* 메뉴는 미국 피자 가게인 [Pinocchio's Pizza & Subs](http://www.pinocchiospizza.net/menu.html)를 참고하였습니다.
 
 
 ## 문제해결 고려사항
