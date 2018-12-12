@@ -1,6 +1,6 @@
 # Project 3 - Pizza (Django)
 
-English: [README_KOR.md](https://github.com/syntaxkim/project3-pizza/blob/master/README.md)
+English: [README.md](https://github.com/syntaxkim/project3-pizza/blob/master/README.md)
 
 온라인 피자 주문 및 주문관리 웹 앱입니다. 메뉴를 통해 카트에 담은 뒤 주문을 할 수 있으며, 사진 업로드와 후기 작성을 수 있습니다. 관리자는 관리 페이지에서 주문을 확인하고 상태를 갱신할 수 있습니다.
 
