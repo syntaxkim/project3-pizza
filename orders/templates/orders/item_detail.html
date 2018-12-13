@@ -71,9 +71,10 @@
         
     </tbody>
 </table>
-<input type="submit" value="Add to Cart" class="btn btn-info">
+<div class="row justify-content-between">
+    <a href="{% url 'index' %}" class="btn btn-outline-info">Go back to menu.</a>
+    <input type="submit" value="Add to Cart" class="btn btn-info">
+</div>
 </form>
-
-<a href="{% url 'index' %}">Go back to menu</a>
 
 {% endblock %}
