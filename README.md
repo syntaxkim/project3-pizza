@@ -2,7 +2,7 @@
 
 한국어: [README_KOR.md](https://github.com/syntaxkim/project3-pizza/blob/master/README_KOR.md)
 
-A web application for handling a pizza restaurant's online orders. Users can browse the retaurant's menu, add items to their cart, and submit their orders. They also can post reviews with photos. Meanwhile, the restaurant owners can view orders that havve been placed and update order status as needed.
+A web application for handling a pizza restaurant's online orders. Users can browse the retaurant's menu, add items to their cart, and submit their orders. They also can post reviews with photos. Meanwhile, the restaurant owners can view orders that have been placed and update order status as needed.
 
 ![menu](https://github.com/syntaxkim/project3-pizza/blob/master/screenshots/menu.png?raw=true)
 * The menu model comes from [Pinocchio's Pizza & Subs](http://www.pinocchiospizza.net/menu.html) located in Cambridge, MA.
