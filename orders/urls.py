@@ -1,11 +1,12 @@
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import cache_page
 from django.urls import path
 
 from . import views
 
 urlpatterns = [
     path('', views.RedirectView.as_view(url='/menu'), name='home'), # Redirect to menu
-    path('menu', views.IndexView.as_view(), name='index'),
+    path('menu', cache_page(3600 * 24, key_prefix="menu")(views.IndexView.as_view()), name='index'),
     path('item/<int:pk>', views.ItemDetail.as_view(), name='item_detail'),
     path('cart', login_required(views.CartItemList.as_view(), login_url='/login'), name='cart'),
     path('cart/add/<int:pk>', login_required(views.AddItem.as_view(), login_url='/login'), name='add_item'),
